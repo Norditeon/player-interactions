@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.leonardo.interacciones.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "PoseJugadorMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
