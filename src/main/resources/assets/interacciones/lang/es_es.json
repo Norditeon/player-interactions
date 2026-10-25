@@ -168,5 +168,7 @@
   "emocion.interacciones.lluvia_derrotado": "Derrotado bajo la lluvia",
   "emocion.interacciones.golpear_suelo": "Golpear el suelo",
   "emocion.interacciones.meditar": "Meditar",
-  "emocion.interacciones.acostarse": "Acostarse"
+  "emocion.interacciones.acostarse": "Acostarse",
+  "interacciones.atajo.editar_emociones": "editar emociones",
+  "interacciones.atajo.editar_interacciones": "editar interacciones"
 }

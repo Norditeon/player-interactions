@@ -12,6 +12,8 @@ import com.leonardo.interacciones.dominio.TipoInteraccion;
 import com.leonardo.interacciones.red.PedirInteraccion;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -29,13 +31,16 @@ final class PantallaRueda extends RuedaRadial {
         this.objetivo = objetivo;
     }
 
-    /** Lo que edita PantallaRepertorio para esta rueda; al volver, la rueda sigue apuntando al mismo jugador. */
-    static PantallaRepertorio.Coleccion<TipoInteraccion> coleccion(Player objetivo) {
+    /**
+     * Lo que edita PantallaRepertorio para la rueda de interacciones. volver: a qué pantalla regresar
+     * (esta rueda apuntando al mismo jugador, o la ruleta de emociones si se editó desde allí).
+     */
+    static PantallaRepertorio.Coleccion<TipoInteraccion> coleccion(Supplier<Screen> volver) {
         return new PantallaRepertorio.Coleccion<>(
                 Component.translatable("interacciones.repertorio.titulo_rueda"),
                 TipoInteraccion.repertorio(), ConfiguracionCliente.ruedaInteracciones(),
                 ConfiguracionCliente::guardarRuedaInteracciones,
-                tipo -> Component.translatable(tipo.claveTraduccion("nombre")), () -> new PantallaRueda(objetivo));
+                tipo -> Component.translatable(tipo.claveTraduccion("nombre")), volver);
     }
 
     @Override
@@ -85,7 +90,7 @@ final class PantallaRueda extends RuedaRadial {
             return true;
         }
         if (tecla == GLFW.GLFW_KEY_E && minecraft != null) {
-            minecraft.setScreen(new PantallaRepertorio<>(coleccion(objetivo)));
+            minecraft.setScreen(new PantallaRepertorio<>(coleccion(() -> new PantallaRueda(objetivo))));
             return true;
         }
         return false;

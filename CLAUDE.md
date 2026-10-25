@@ -21,7 +21,7 @@ Paquete `com.leonardo.interacciones`, mod id `interacciones`. Mapa del código y
   en Pre para no desequilibrar la pila si otro mod cancela). Los giros se escalan solo con la intensidad de entrada/salida,
   no con el peso: las vueltas terminan en 2π.
 - Las dos ruedas de cada jugador viven en `ConfiguracionCliente` (config CLIENT, claves); `PantallaRepertorio<T>` edita
-  cualquiera vía `Coleccion`.
+  cualquiera vía `Coleccion`. La ruleta de emociones abre ambos editores (E emociones, I interacciones).
 - `red/`: records `CustomPacketPayload` + `StreamCodec`. Los enums viajan por índice (`CodecsDominio`).
 - `servidor/`: autoridad. Todo se valida aquí (distancia, enfriamiento, `permitirForzar`); el cliente nunca decide.
 - `cliente/`: rueda (`Screen` propio), aviso en HUD (`RegisterGuiLayersEvent`), animaciones.
@@ -36,8 +36,9 @@ Paquete `com.leonardo.interacciones`, mod id `interacciones`. Mapa del código y
 ## Convenciones
 - Nombres y comentarios en español; cada archivo empieza con un comentario de cabecera (qué hace, de quién recibe, a quién da).
 - Colores solo en `ColoresInterfaz` (tokens del sistema de diseño terminal: radio 0, un acento, líneas de 1 px).
-- Textos solo en `lang/es_es.json` y `lang/en_us.json` (las variantes es_* se copian al compilar desde es_es);
-  `TraduccionesTest` exige que ambos tengan las mismas claves y todas las dinámicas.
+- Textos en `lang/*.json`: en_us (referencia), es_es (las variantes es_* se copian al compilar), fr_fr, de_de, ru_ru,
+  ja_jp, zh_cn. `TraduccionesTest` exige en todos las mismas claves que en_us, los mismos marcadores `%s` y las
+  claves dinámicas. Un texto nuevo hay que añadirlo en los 7 idiomas.
 - Animaciones: si una pieza se mueve en algún fotograma de peso > 0, se define en todos (null = "lo del fotograma vecino").
 - Suscriptores `@EventBusSubscriber` públicos con métodos `public static`; sin parámetro `bus` (obsoleto).
 

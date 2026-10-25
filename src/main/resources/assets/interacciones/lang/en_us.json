@@ -168,5 +168,7 @@
   "emocion.interacciones.lluvia_derrotado": "Defeated in the rain",
   "emocion.interacciones.golpear_suelo": "Pound the ground",
   "emocion.interacciones.meditar": "Meditate",
-  "emocion.interacciones.acostarse": "Lie down"
+  "emocion.interacciones.acostarse": "Lie down",
+  "interacciones.atajo.editar_emociones": "edit emotes",
+  "interacciones.atajo.editar_interacciones": "edit interactions"
 }

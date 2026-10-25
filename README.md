@@ -34,7 +34,8 @@ Se entrega el montón entero de la mano; las flores, de una en una. Agachado, el
 
 ### Ruleta de emociones (tecla `G`)
 
-8 casillas que eliges tú (`E` con la ruleta abierta). Las que se repiten siguen **aunque camines**, hasta que
+8 casillas que eliges tú: con la ruleta abierta, `E` edita las emociones e `I` la **rueda de interacciones**
+(así no hace falta tener a otro jugador delante para configurarla). Las que se repiten siguen **aunque camines**, hasta que
 las cortas: abre la ruleta y elige una casilla vacía o el centro ("Detener"). Muchas sueltan partículas
 (lágrimas al llorar, una nube que te llueve encima, notas al bailar, corazones al estar enamorado…).
 
@@ -47,7 +48,7 @@ y las que usan **el objeto de tu mano**: comer, practicar con la espada, malabar
 
 ### Idiomas
 
-Español e inglés, según el idioma del juego (todas las variantes de español de Minecraft).
+Según el idioma del juego: español (todas sus variantes), inglés, francés, alemán, ruso, japonés y chino simplificado.
 
 ## Instalar
 
@@ -135,8 +136,8 @@ export JAVA_HOME="$(mise where java)"
 | `mixin/PoseJugadorMixin.java` | Engancha `PosesInteraccion` a `PlayerModel.setupAnim`. |
 | `mixin/ObjetoEnManoMixin.java` | Deja de dibujar el objeto de la mano mientras vuela. |
 
-Recursos: `src/main/resources/assets/interacciones/lang/` (`es_es.json` y `en_us.json`; el resto de variantes de español
-se copian al compilar), `interacciones.mixins.json` y `src/main/templates/META-INF/neoforge.mods.toml`.
+Recursos: `src/main/resources/assets/interacciones/lang/` (en, es, fr, de, ru, ja, zh; las demás variantes de español
+se copian de `es_es.json` al compilar), `interacciones.mixins.json` y `src/main/templates/META-INF/neoforge.mods.toml`.
 
 ## Flujo de datos
 
@@ -178,5 +179,7 @@ G → PantallaRuedaEmociones ──HacerEmocion / DetenerMiEmocion──▶ Emoc
 - **Cambiar una animación:** sus fotogramas (momento 0..1, curva y pose). Convenciones en la cabecera de `Postura.java`.
 - **Cambiar las ruedas por defecto:** `RULETA_POR_DEFECTO` y `RUEDA_POR_DEFECTO` en `ConfiguracionCliente`.
 - **Cambiar qué cuenta como flor:** `ItemTags.FLOWERS` en `GestorEntregas.alOfrecer`.
-- **Cambiar colores:** solo en `ColoresInterfaz`. **Textos:** `lang/es_es.json` y `lang/en_us.json`.
+- **Cambiar colores:** solo en `ColoresInterfaz`. **Textos:** `lang/*.json` (`en_us.json` es la referencia).
+- **Añadir un idioma:** copia `en_us.json` con el código de Minecraft (p. ej. `pt_br.json`), tradúcelo y añádelo a
+  `IDIOMAS` en `TraduccionesTest`, que comprueba que tenga todas las claves y los mismos `%s`.
 - **Cambiar el formato de un paquete:** súbelo en `RegistroRed.VERSION_PROTOCOLO`.

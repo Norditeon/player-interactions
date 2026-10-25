@@ -1,7 +1,8 @@
 // Ruleta de emociones: se abre con su tecla (G por defecto) y muestra las 8 casillas que el
 // jugador eligió (ConfiguracionCliente). Elegir una emoción envía HacerEmocion; una casilla
 // vacía o el centro envían DetenerMiEmocion y cortan la que esté en curso.
-// E abre PantallaRepertorio para cambiar qué hay en cada casilla.
+// E abre PantallaRepertorio para cambiar qué hay en cada casilla; I, para cambiar la rueda de
+// interacciones (así se puede editar sin tener a otro jugador delante).
 package com.leonardo.interacciones.cliente;
 
 import com.leonardo.interacciones.ConfiguracionCliente;
@@ -52,8 +53,15 @@ final class PantallaRuedaEmociones extends RuedaRadial {
 
     @Override
     protected boolean alPulsarTecla(int tecla) {
-        if (tecla == GLFW.GLFW_KEY_E && minecraft != null) {
+        if (minecraft == null) {
+            return false;
+        }
+        if (tecla == GLFW.GLFW_KEY_E) {
             minecraft.setScreen(new PantallaRepertorio<>(coleccion()));
+            return true;
+        }
+        if (tecla == GLFW.GLFW_KEY_I) {
+            minecraft.setScreen(new PantallaRepertorio<>(PantallaRueda.coleccion(PantallaRuedaEmociones::new)));
             return true;
         }
         return false;
@@ -92,7 +100,8 @@ final class PantallaRuedaEmociones extends RuedaRadial {
         return List.of(
                 new Atajo("1-" + casillas.size(), "interacciones.atajo.elegir"),
                 new Atajo("clic", "interacciones.atajo.confirmar"),
-                new Atajo("e", "interacciones.atajo.editar"),
+                new Atajo("e", "interacciones.atajo.editar_emociones"),
+                new Atajo("i", "interacciones.atajo.editar_interacciones"),
                 new Atajo("esc", "interacciones.atajo.cerrar"));
     }
 }
