@@ -50,7 +50,7 @@ public final class GestorSolicitudes {
      */
     static boolean pedir(ServerPlayer solicitante, ServerPlayer objetivo, TipoInteraccion tipo,
                          ModoPeticion modo, ItemStack objeto) {
-        ResultadoPeticion resultado = validar(solicitante, modo);
+        ResultadoPeticion resultado = validar(solicitante, tipo, modo);
         // Se planifica ya al pedir para avisar enseguida si no hay sitio, no tras esperar la respuesta.
         Planificacion plan = planificarEncuentro(solicitante, objetivo, tipo);
         if (resultado == ResultadoPeticion.ACEPTADA && !plan.valida()) {
@@ -61,8 +61,9 @@ public final class GestorSolicitudes {
             return false;
         }
         REGISTRO.anotarUso(solicitante.getUUID(), tickActual(solicitante));
-        if (modo == ModoPeticion.FORZAR) {
-            InteraccionesEnCurso.iniciar(solicitante, objetivo, tipo, true, plan.destinos());
+        // Los golpes y bromas nunca preguntan, pero no cuentan como "forzados": no hay gesto que rechazar.
+        if (!tipo.requiereConsentimiento() || modo == ModoPeticion.FORZAR) {
+            InteraccionesEnCurso.iniciar(solicitante, objetivo, tipo, tipo.requiereConsentimiento(), plan.destinos());
             return true;
         }
         return enviarSolicitud(solicitante, objetivo, tipo, objeto);
@@ -123,8 +124,11 @@ public final class GestorSolicitudes {
         }
     }
 
-    private static ResultadoPeticion validar(ServerPlayer solicitante, ModoPeticion modo) {
-        if (modo == ModoPeticion.FORZAR && !Configuracion.forzarPermitido()) {
+    private static ResultadoPeticion validar(ServerPlayer solicitante, TipoInteraccion tipo, ModoPeticion modo) {
+        if (!tipo.requiereConsentimiento() && !Configuracion.golpesPermitidos()) {
+            return ResultadoPeticion.GOLPES_DESACTIVADOS;
+        }
+        if (tipo.requiereConsentimiento() && modo == ModoPeticion.FORZAR && !Configuracion.forzarPermitido()) {
             return ResultadoPeticion.FORZAR_DESACTIVADO;
         }
         long enfriamiento = (long) Configuracion.SEGUNDOS_ENTRE_INTERACCIONES.get() * TICKS_POR_SEGUNDO;

@@ -1,6 +1,7 @@
 // Efectos visibles de una interacción: avisa a los clientes cercanos para que la animen
-// (ReproducirInteraccion) o la corten (DetenerAnimacion), lanza partículas y sonido, y
-// muestra los mensajes. Lo llama InteraccionesEnCurso cuando los jugadores ya están juntos.
+// (ReproducirInteraccion) o la corten (DetenerAnimacion), aplica el golpe (daño y retroceso)
+// en el momento de contacto, lanza partículas y sonido, y muestra los mensajes.
+// Lo llama InteraccionesEnCurso cuando los jugadores ya están juntos.
 package com.leonardo.interacciones.servidor;
 
 import com.leonardo.interacciones.dominio.TipoInteraccion;
@@ -18,17 +19,54 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 final class EjecutorInteraccion {
 
+    /** Cada cuántos ticks salen las partículas que acompañan a un gesto mientras dura. */
+    private static final int TICKS_ENTRE_PARTICULAS = 8;
+
     private EjecutorInteraccion() {
     }
 
     /** Los jugadores ya están en contacto (InteraccionesEnCurso los acercó): empieza el gesto. */
     static void comenzar(ServerPlayer actor, ServerPlayer receptor, TipoInteraccion tipo, boolean forzada) {
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(
-                actor, new ReproducirInteraccion(actor.getId(), receptor.getId(), tipo));
-        lanzarEfectos(actor, receptor, tipo);
+                actor, new ReproducirInteraccion(actor.getId(), receptor.getId(), tipo, forzada));
+        // Los golpes suenan al impactar, no al empezar.
+        if (!tipo.golpea()) {
+            lanzarEfectos(actor, receptor, tipo);
+        }
         // En las entregas el mensaje sale cuando el objeto cambia de mano (GestorEntregas).
         if (!tipo.entregaObjeto()) {
             AvisosJugador.realizada(actor, receptor, tipo, forzada, null);
+        }
+    }
+
+    /**
+     * El golpe llega: daño (como un ataque del actor, así respeta el PvP del servidor y los
+     * equipos) y retroceso alejándolo de quien golpea.
+     */
+    static void impactar(ServerPlayer actor, ServerPlayer receptor, TipoInteraccion tipo) {
+        if (tipo.danio() > 0) {
+            receptor.hurt(actor.damageSources().playerAttack(actor), tipo.danio());
+        }
+        if (tipo.empuje() > 0) {
+            receptor.knockback(tipo.empuje(), actor.getX() - receptor.getX(), actor.getZ() - receptor.getZ());
+            // Sin esto, la velocidad del retroceso no llega al cliente del jugador golpeado.
+            receptor.hurtMarked = true;
+        }
+        lanzarEfectos(actor, receptor, tipo);
+    }
+
+    /** Partículas que acompañan a algunos gestos mientras duran. */
+    static void duranteGesto(ServerPlayer actor, ServerPlayer receptor, TipoInteraccion tipo, int ticks) {
+        if (ticks % TICKS_ENTRE_PARTICULAS != 0) {
+            return;
+        }
+        switch (tipo) {
+            case BESAR_MANO -> encimaDe(actor, ParticleTypes.HEART);
+            case BAILAR_JUNTOS -> encimaDe(ticks % 16 == 0 ? actor : receptor, ParticleTypes.NOTE);
+            case CONSOLAR -> encimaDe(receptor, ParticleTypes.FALLING_WATER);
+            case COSQUILLAS -> encimaDe(receptor, ParticleTypes.HAPPY_VILLAGER);
+            default -> {
+            }
         }
     }
 
@@ -41,6 +79,11 @@ final class EjecutorInteraccion {
         }
     }
 
+    private static void encimaDe(ServerPlayer jugador, ParticleOptions particula) {
+        jugador.serverLevel().sendParticles(particula, jugador.getX(), jugador.getY() + 2.1, jugador.getZ(),
+                1, 0.25, 0.1, 0.25, 0);
+    }
+
     private static void lanzarEfectos(ServerPlayer actor, ServerPlayer receptor, TipoInteraccion tipo) {
         ServerLevel nivel = actor.serverLevel();
         Vec3 puntoMedio = actor.getEyePosition().add(receptor.getEyePosition()).scale(0.5);
@@ -50,19 +93,24 @@ final class EjecutorInteraccion {
                 sonidoDe(tipo), SoundSource.PLAYERS, 0.8F, 1.0F + nivel.random.nextFloat() * 0.2F);
     }
 
-    /** Corazones para gestos de cariño, chispas verdes para gestos de amistad. */
+    /** Corazones para el cariño, chispas verdes para la amistad, críticos para los golpes. */
     private static ParticleOptions particulaDe(TipoInteraccion tipo) {
         return switch (tipo) {
-            case ABRAZAR, BESO_MEJILLA, BESO_BOCA, TOMAR_MANO, PALMADITAS_CABEZA, ENTREGAR_FLOR -> ParticleTypes.HEART;
-            case CHOCAR_CINCO, CHOCAR_PUNOS, ESTRECHAR_MANO, ENTREGAR_OBJETO -> ParticleTypes.HAPPY_VILLAGER;
+            case ABRAZAR, BESO_MEJILLA, BESO_BOCA, TOMAR_MANO, PALMADITAS_CABEZA, ENTREGAR_FLOR,
+                 BESAR_MANO, CONSOLAR, BAILAR_JUNTOS -> ParticleTypes.HEART;
+            case CHOCAR_CINCO, CHOCAR_PUNOS, ESTRECHAR_MANO, ENTREGAR_OBJETO, SALUDO_COLEGA,
+                 COSQUILLAS -> ParticleTypes.HAPPY_VILLAGER;
+            case CACHETADA, PUNETAZO, EMPUJAR, PATADA_TRASERO, NALGADA -> ParticleTypes.CRIT;
         };
     }
 
     private static SoundEvent sonidoDe(TipoInteraccion tipo) {
         return switch (tipo) {
-            case ABRAZAR, TOMAR_MANO, PALMADITAS_CABEZA -> SoundEvents.WOOL_PLACE;
-            case BESO_MEJILLA, BESO_BOCA, ENTREGAR_FLOR -> SoundEvents.AMETHYST_BLOCK_CHIME;
-            case CHOCAR_CINCO, CHOCAR_PUNOS, ESTRECHAR_MANO -> SoundEvents.PLAYER_ATTACK_WEAK;
+            case ABRAZAR, TOMAR_MANO, PALMADITAS_CABEZA, CONSOLAR, COSQUILLAS -> SoundEvents.WOOL_PLACE;
+            case BESO_MEJILLA, BESO_BOCA, ENTREGAR_FLOR, BESAR_MANO, BAILAR_JUNTOS -> SoundEvents.AMETHYST_BLOCK_CHIME;
+            case CHOCAR_CINCO, CHOCAR_PUNOS, ESTRECHAR_MANO, SALUDO_COLEGA, EMPUJAR -> SoundEvents.PLAYER_ATTACK_WEAK;
+            case CACHETADA, NALGADA -> SoundEvents.PLAYER_ATTACK_STRONG;
+            case PUNETAZO, PATADA_TRASERO -> SoundEvents.PLAYER_ATTACK_KNOCKBACK;
             case ENTREGAR_OBJETO -> SoundEvents.BUNDLE_INSERT;
         };
     }

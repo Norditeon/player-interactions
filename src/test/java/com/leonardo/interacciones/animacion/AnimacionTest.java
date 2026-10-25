@@ -73,7 +73,7 @@ class AnimacionTest {
     void lasInteraccionesTerminanEnReposoYEmpiezanEnReposoSalvoQuienEntrega() {
         for (TipoInteraccion tipo : TipoInteraccion.values()) {
             for (Papel papel : Papel.values()) {
-                List<Fotograma> fotogramas = CatalogoAnimaciones.de(tipo, papel).fotogramas();
+                List<Fotograma> fotogramas = CatalogoAnimaciones.de(tipo, papel, false).fotogramas();
                 String nombre = tipo + "/" + papel;
                 comprobarMomentosOrdenados(fotogramas, nombre);
                 // Quien entrega ya tenía la mano extendida (emoción de ofrecer): empieza con peso 1.
@@ -82,6 +82,25 @@ class AnimacionTest {
                 assertEquals(0, ultimo(fotogramas).postura().peso(), TOLERANCIA, nombre);
             }
         }
+    }
+
+    @Test
+    void lasReaccionesForzadasEmpiezanYTerminanEnReposoYSoloSonDeGestosConPermiso() {
+        CatalogoAnimaciones.reaccionesForzadas().forEach((tipo, animacion) -> {
+            comprobarMomentosOrdenados(animacion.fotogramas(), "forzada " + tipo);
+            assertEquals(0, animacion.fotogramas().get(0).postura().peso(), TOLERANCIA, tipo.name());
+            assertEquals(0, ultimo(animacion.fotogramas()).postura().peso(), TOLERANCIA, tipo.name());
+            assertTrue(tipo.requiereConsentimiento() && !tipo.entregaObjeto(), tipo.name());
+        });
+        assertTrue(CatalogoAnimaciones.reaccionesForzadas().containsKey(TipoInteraccion.BESO_BOCA));
+    }
+
+    @Test
+    void sinReaccionPropiaElForzadoUsaLaNormal() {
+        assertEquals(CatalogoAnimaciones.de(TipoInteraccion.COSQUILLAS, Papel.RECEPTOR, false),
+                CatalogoAnimaciones.de(TipoInteraccion.COSQUILLAS, Papel.RECEPTOR, true));
+        assertEquals(CatalogoAnimaciones.de(TipoInteraccion.BESO_BOCA, Papel.ACTOR, false),
+                CatalogoAnimaciones.de(TipoInteraccion.BESO_BOCA, Papel.ACTOR, true));
     }
 
     @Test

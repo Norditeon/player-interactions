@@ -1,4 +1,5 @@
 // Servidor → clientes cercanos: "anima a estos dos jugadores con esta interacción".
+// forzada: el receptor no la aceptó, así que reacciona distinto (CatalogoAnimaciones).
 // Lo envía EjecutorInteraccion; el cliente lo guarda en AnimacionesActivas.
 package com.leonardo.interacciones.red;
 
@@ -9,7 +10,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
-public record ReproducirInteraccion(int idEntidadActor, int idEntidadReceptor, TipoInteraccion tipo)
+public record ReproducirInteraccion(int idEntidadActor, int idEntidadReceptor, TipoInteraccion tipo, boolean forzada)
         implements CustomPacketPayload {
 
     public static final Type<ReproducirInteraccion> TIPO = new Type<>(InteraccionesAmistosas.recurso("reproducir"));
@@ -18,6 +19,7 @@ public record ReproducirInteraccion(int idEntidadActor, int idEntidadReceptor, T
             ByteBufCodecs.VAR_INT, ReproducirInteraccion::idEntidadActor,
             ByteBufCodecs.VAR_INT, ReproducirInteraccion::idEntidadReceptor,
             CodecsDominio.TIPO, ReproducirInteraccion::tipo,
+            ByteBufCodecs.BOOL, ReproducirInteraccion::forzada,
             ReproducirInteraccion::new);
 
     @Override

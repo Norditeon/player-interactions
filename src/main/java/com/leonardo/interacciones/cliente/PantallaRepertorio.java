@@ -1,21 +1,27 @@
-// Editor de la ruleta de emociones. A la izquierda las 8 casillas de la ruleta; a la derecha
-// todo el repertorio. Se elige una casilla (clic o 1-8) y luego una emoción para ponerla ahí.
-// Al salir (Esc) guarda en ConfiguracionCliente y vuelve a PantallaRuedaEmociones.
+// Editor de una rueda (emociones o interacciones). A la izquierda sus 8 casillas; a la derecha
+// todo el repertorio. Se elige una casilla (clic o 1-8) y luego una opción para ponerla ahí.
+// Qué rueda edita lo dice la Coleccion que le pasan PantallaRuedaEmociones o PantallaRueda;
+// al salir (Esc) la guarda en ConfiguracionCliente y vuelve a esa rueda.
 package com.leonardo.interacciones.cliente;
 
-import com.leonardo.interacciones.ConfiguracionCliente;
-import com.leonardo.interacciones.dominio.TipoEmocion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
-final class PantallaRepertorio extends Screen {
+final class PantallaRepertorio<T> extends Screen {
 
-    private static final List<TipoEmocion> REPERTORIO = TipoEmocion.repertorio();
+    /** Qué se edita: el repertorio completo, las casillas actuales, cómo guardarlas y a dónde volver. */
+    record Coleccion<T>(Component titulo, List<T> repertorio, List<T> casillas, Consumer<List<T>> guardar,
+                        Function<T, Component> nombre, Supplier<Screen> volver) {
+    }
+
     private static final int MARGEN = 16;
     private static final int ANCHO_COLUMNA_RULETA = 150;
     private static final int ALTO_FILA = 14;
@@ -23,12 +29,15 @@ final class PantallaRepertorio extends Screen {
     private static final int ALTO_ETIQUETA = 16;
     private static final int NINGUNA = -1;
 
-    private final List<TipoEmocion> casillas = new ArrayList<>(ConfiguracionCliente.ruleta());
+    private final Coleccion<T> coleccion;
+    private final List<T> casillas;
     private int casillaElegida;
     private int desplazamiento;
 
-    PantallaRepertorio() {
-        super(Component.translatable("interacciones.repertorio.titulo"));
+    PantallaRepertorio(Coleccion<T> coleccion) {
+        super(coleccion.titulo());
+        this.coleccion = coleccion;
+        this.casillas = new ArrayList<>(coleccion.casillas());
     }
 
     @Override
@@ -38,9 +47,9 @@ final class PantallaRepertorio extends Screen {
 
     @Override
     public void onClose() {
-        ConfiguracionCliente.guardarRuleta(casillas);
+        coleccion.guardar().accept(casillas);
         if (minecraft != null) {
-            minecraft.setScreen(new PantallaRuedaEmociones());
+            minecraft.setScreen(coleccion.volver().get());
         }
     }
 
@@ -77,7 +86,7 @@ final class PantallaRepertorio extends Screen {
         }
         int emocion = filaRepertorioBajo(ratonX, ratonY);
         if (emocion != NINGUNA) {
-            asignar(REPERTORIO.get(emocion));
+            asignar(coleccion.repertorio().get(emocion));
             return true;
         }
         return super.mouseClicked(ratonX, ratonY, boton);
@@ -103,8 +112,8 @@ final class PantallaRepertorio extends Screen {
         return super.keyPressed(tecla, codigoEscaneo, modificadores);
     }
 
-    /** Una emoción solo puede estar en una casilla: si ya estaba en otra, se mueve. */
-    private void asignar(TipoEmocion emocion) {
+    /** Cada opción solo puede estar en una casilla: si ya estaba en otra, se mueve. */
+    private void asignar(T emocion) {
         int anterior = casillas.indexOf(emocion);
         if (anterior != NINGUNA) {
             casillas.set(anterior, null);
@@ -123,9 +132,9 @@ final class PantallaRepertorio extends Screen {
             dibujarFondoFila(graficos, x, fila, ANCHO_COLUMNA_RULETA, elegida, i == bajoRaton);
             graficos.drawString(font, String.valueOf(i + 1), x + 6, fila + 3,
                     elegida ? ColoresInterfaz.ACENTO : ColoresInterfaz.TEXTO_TENUE, false);
-            TipoEmocion tipo = casillas.get(i);
+            T tipo = casillas.get(i);
             Component nombre = tipo == null ? Component.translatable("interacciones.ruleta.vacia")
-                    : Component.translatable(tipo.claveTraduccion());
+                    : coleccion.nombre().apply(tipo);
             graficos.drawString(font, nombre, x + 20, fila + 3,
                     tipo == null ? ColoresInterfaz.TEXTO_TENUE : ColoresInterfaz.TEXTO_PRINCIPAL, false);
         }
@@ -138,12 +147,12 @@ final class PantallaRepertorio extends Screen {
         graficos.drawString(font, Component.translatable("interacciones.repertorio.seccion_repertorio"), x, y,
                 ColoresInterfaz.TEXTO_TENUE, false);
         graficos.enableScissor(x, arribaLista(), x + ancho, abajoLista());
-        for (int i = 0; i < REPERTORIO.size(); i++) {
+        for (int i = 0; i < coleccion.repertorio().size(); i++) {
             int fila = arribaLista() + i * ALTO_FILA - desplazamiento;
-            TipoEmocion tipo = REPERTORIO.get(i);
+            T tipo = coleccion.repertorio().get(i);
             int enCasilla = casillas.indexOf(tipo);
             dibujarFondoFila(graficos, x, fila, ancho, false, i == bajoRaton);
-            graficos.drawString(font, Component.translatable(tipo.claveTraduccion()), x + 6, fila + 3,
+            graficos.drawString(font, coleccion.nombre().apply(tipo), x + 6, fila + 3,
                     enCasilla == NINGUNA ? ColoresInterfaz.TEXTO_SECUNDARIO : ColoresInterfaz.TEXTO_PRINCIPAL, false);
             if (enCasilla != NINGUNA) {
                 Component marca = Component.translatable("interacciones.repertorio.en_casilla", enCasilla + 1);
@@ -177,11 +186,11 @@ final class PantallaRepertorio extends Screen {
             return NINGUNA;
         }
         int fila = (int) Math.floor((ratonY - arribaLista() + desplazamiento) / ALTO_FILA);
-        return fila < REPERTORIO.size() ? fila : NINGUNA;
+        return fila < coleccion.repertorio().size() ? fila : NINGUNA;
     }
 
     private int desplazamientoMaximo() {
-        return Math.max(0, REPERTORIO.size() * ALTO_FILA - (abajoLista() - arribaLista()));
+        return Math.max(0, coleccion.repertorio().size() * ALTO_FILA - (abajoLista() - arribaLista()));
     }
 
     private int arribaContenido() {

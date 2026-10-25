@@ -1,6 +1,7 @@
 // Coreografía de cada emoción en solitario (TipoEmocion). La consulta AnimacionesActivas
-// (cliente) al empezar una emoción; también aporta las poses de "ofrecer" que reutiliza
-// CatalogoAnimaciones para que la entrega empiece donde acabó el ofrecimiento.
+// (cliente) al empezar una emoción. Las primeras están aquí; las nuevas, repartidas por tema
+// en EmocionesConObjeto, EmocionesDeCuerpoEntero y EmocionesDePose. También aporta las poses
+// de "ofrecer" que reutiliza CatalogoAnimaciones para que la entrega empiece donde acabó.
 //
 // Reglas para escribir una emoción (ver convenciones de ángulos en Postura):
 //   - Cíclica: el primer y el último fotograma son la misma pose con peso 1 (así el bucle no
@@ -10,6 +11,7 @@
 //     quedaría con el valor del fotograma vecino.
 package com.leonardo.interacciones.animacion;
 
+import static com.leonardo.interacciones.animacion.Animacion.ciclo;
 import static com.leonardo.interacciones.animacion.Fotograma.en;
 import static com.leonardo.interacciones.animacion.Postura.REPOSO;
 import static com.leonardo.interacciones.animacion.Postura.activa;
@@ -75,19 +77,29 @@ public final class CatalogoEmociones {
             case SALUDO_MILITAR -> saludoMilitar();
             case SENALAR -> senalar();
             case BOSTEZAR -> bostezar();
+            case ENAMORADO -> EmocionesDePose.enamorado();
+            case BESO_AL_AIRE -> EmocionesDePose.besoAlAire();
+            case SUPLICAR -> EmocionesDeCuerpoEntero.suplicar();
+            case GIRO -> EmocionesDeCuerpoEntero.giro();
+            case MORTAL -> EmocionesDeCuerpoEntero.mortal();
+            case ENTRENAR_PUNOS -> EmocionesDePose.entrenarPunetazos();
+            case COMER -> EmocionesConObjeto.comer();
+            case PRACTICAR_ESPADA -> EmocionesConObjeto.practicarEspada();
+            case SIGILO -> EmocionesDeCuerpoEntero.sigilo();
+            case MALABAR -> EmocionesConObjeto.malabar();
+            case DETENER_ALTO -> EmocionesDePose.detenerAlto();
+            case SENTARSE_HORIZONTE -> EmocionesDeCuerpoEntero.sentarseMirandoHorizonte();
+            case LANZAR -> EmocionesConObjeto.lanzar();
+            case PERREO -> EmocionesDePose.perreo();
+            case POSE_SEXY -> EmocionesDePose.poseSexy();
+            case POSE_HEROE -> EmocionesDePose.poseHeroe();
+            case LLUVIA_DERROTADO -> EmocionesDePose.derrotadoBajoLaLluvia();
+            case GOLPEAR_SUELO -> EmocionesDeCuerpoEntero.golpearSuelo();
+            case MEDITAR -> EmocionesDeCuerpoEntero.meditar();
+            case ACOSTARSE -> EmocionesDeCuerpoEntero.acostarse();
             case OFRECER_OBJETO -> ciclo(SUAVE, OFRECIENDO_OBJETO, OFRECIENDO_OBJETO.brazoDerecho(-1.02F, -0.2F, 0));
             case OFRECER_FLOR -> ciclo(SUAVE, timidoOfreciendo(0.04F, 0.25F), timidoOfreciendo(-0.04F, 0.05F));
         };
-    }
-
-    /** Vuelta cíclica: las poses se reparten a partes iguales y al final se vuelve a la primera. */
-    private static Animacion ciclo(Suavizado curva, Postura... poses) {
-        Fotograma[] fotogramas = new Fotograma[poses.length + 1];
-        for (int i = 0; i < poses.length; i++) {
-            fotogramas[i] = en((float) i / poses.length, i == 0 ? LINEAL : curva, poses[i]);
-        }
-        fotogramas[poses.length] = en(1, curva, poses[0]);
-        return Animacion.de(fotogramas);
     }
 
     /** Cadera de lado a lado, un brazo arriba y otro abajo que se van turnando, rodillas que marcan el paso. */

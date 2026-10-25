@@ -47,6 +47,15 @@ class AcercamientoTest {
     }
 
     @Test
+    void quienEstaDeEspaldasMiraAlLadoContrarioDeQuienEstaDetras() {
+        Posicion opuesto = Acercamiento.puntoOpuesto(new Posicion(0, 64, 0), new Posicion(1, 64, 0.5));
+
+        assertEquals(2, opuesto.x(), TOLERANCIA);
+        assertEquals(1, opuesto.z(), TOLERANCIA);
+        assertEquals(64, opuesto.y(), TOLERANCIA);
+    }
+
+    @Test
     void elTrayectoEmpiezaYTerminaEnSusExtremos() {
         Posicion desde = new Posicion(0, 0, 0);
         Posicion hasta = new Posicion(1, 0, 0);

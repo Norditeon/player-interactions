@@ -1,82 +1,72 @@
 # Interacciones Amistosas
 
-Mod para **Minecraft Java 1.21.1 + NeoForge 21.1** que añade interacciones afectuosas entre jugadores,
-entregas de objetos y una ruleta de emociones personalizable.
+Mod para **Minecraft Java 1.21.1 + NeoForge 21.1** que añade interacciones entre jugadores (afectuosas,
+de amistad y también golpes y bromas), entregas de objetos y una ruleta de emociones. Las dos ruedas
+se personalizan desde un repertorio.
 
 ## Qué hace
 
-### Gestos entre dos (clic derecho con la mano vacía)
+### Interacciones entre dos (clic derecho con la mano vacía)
 
-Se abre una rueda con 8 opciones:
+Se abre una rueda con 8 casillas que eliges tú (`E` con la rueda abierta abre el repertorio).
 
-| # | Interacción | Partículas |
-|---|---|---|
-| 1 | Abrazar | corazones |
-| 2 | Chocar los cinco | chispas |
-| 3 | Estrechar la mano | chispas |
-| 4 | Beso en la mejilla | corazones |
-| 5 | Beso en la boca | corazones |
-| 6 | Palmaditas en la cabeza | corazones |
-| 7 | Chocar puños | chispas |
-| 8 | Tomar de la mano | corazones |
+| Tipo | Interacciones |
+|---|---|
+| Gestos (piden permiso) | abrazar, chocar los cinco, estrechar la mano, beso en la mejilla, beso en la boca, palmaditas en la cabeza, chocar puños, tomar de la mano, saludo de colegas, besar la mano, hacer cosquillas, consolar, bailar juntos |
+| Golpes y bromas (sin permiso) | cachetada (½ ♥), puñetazo (1 ♥), empujar, patada en el trasero (1 ♥), nalgada |
 
-El centro de la rueda (o `Tab`) cambia el modo:
+- **Pedir** (por defecto): el otro ve un aviso y responde con `Y` / `N`. Si no responde en 15 s, caduca.
+- **Forzar** (centro de la rueda o `Tab`): el gesto ocurre sin preguntar y el otro **reacciona distinto**:
+  si le fuerzas un beso se echa atrás y se limpia la boca, si le abrazas se queda tieso y forcejea, etc.
+- **Golpes y bromas**: nunca preguntan. El daño cuenta como un ataque tuyo, así que respeta el PvP del
+  servidor; se marcan en rojo en la rueda. La patada y la nalgada se hacen **por detrás**: el otro queda de espaldas.
 
-- **Pedir** (por defecto): el otro jugador ve un aviso y responde con `Y` (aceptar) o `N` (rechazar). Si no responde en 15 s, caduca.
-- **Forzar**: la interacción ocurre sin preguntar. El receptor ve "(sin preguntar)" en el mensaje. El servidor puede desactivarlo.
-
-Al ocurrir, los dos jugadores se deslizan solos (~0.3 s) hasta la distancia justa del gesto y quedan cara a cara;
-después se anima el gesto por fases (preparación → contacto → mantener → soltar), salen partículas y suena un efecto.
-La cámara no cambia. Si os separáis a mitad, el gesto se corta. No se puede si hay una pared en medio,
-estáis a distinta altura o alguien duerme, monta, vuela con élitros o nada.
+Al ocurrir, los dos se deslizan solos (~0.3 s) hasta la distancia justa del gesto. El gesto se anima por fases,
+con partículas y sonido; el golpe llega justo cuando la mano (o el pie) toca al otro.
 
 ### Entregar objetos y flores (clic derecho con algo en la mano)
 
-1. Quien da extiende la mano con el objeto y espera. Con una **flor** (cualquiera de la etiqueta
-   `minecraft:flowers`) lo hace con vergüenza: mira al suelo, mano en la nuca, se mece y salen corazones.
-2. Quien recibe ve un aviso con el icono y la cantidad ("Ana te ofrece 12× Diamante") y acepta (`Y`) o rechaza (`N`).
-3. Si acepta, se acercan, quien recibe alarga la mano y el objeto pasa a su inventario cuando las manos
-   se juntan (si no cabe, cae a sus pies).
+1. Quien da extiende la mano y espera. Con una **flor** (etiqueta `minecraft:flowers`) lo hace con vergüenza.
+2. Quien recibe ve el aviso con el icono y la cantidad ("Ana te ofrece 12× Diamante") y acepta (`Y`) o rechaza (`N`).
+3. Si acepta, se acercan y el objeto pasa a su inventario cuando las manos se juntan (si no cabe, cae a sus pies).
 
-Se entrega **el montón entero** que tengas en la mano (para dar menos, sepáralo antes); las flores, de una en una.
-Agachado (`Shift`) el clic derecho usa el objeto como siempre, sin ofrecerlo.
+Se entrega el montón entero de la mano; las flores, de una en una. Agachado, el clic derecho usa el objeto como siempre.
 
 ### Ruleta de emociones (tecla `G`)
 
-8 casillas con emociones que haces tú solo. Las que se repiten (bailar, llorar, sentarse…) siguen hasta
-que las cortas o te mueves; el resto dura unos segundos. **Para cortar la emoción en curso**, abre la ruleta
-y elige una casilla vacía o el centro ("Detener").
+8 casillas que eliges tú (`E` con la ruleta abierta). Las que se repiten siguen **aunque camines**, hasta que
+las cortas: abre la ruleta y elige una casilla vacía o el centro ("Detener"). Muchas sueltan partículas
+(lágrimas al llorar, una nube que te llueve encima, notas al bailar, corazones al estar enamorado…).
 
-Con la ruleta abierta, `E` abre el **repertorio**: eliges una casilla (clic o `1`-`8`) y luego la emoción
-que quieres en ella; clic derecho o `Supr` vacía la casilla. Se guarda al salir con `Esc`.
-
-Repertorio (21): bailar, baile robot, saltar de alegría, saludar, aplaudir, celebrar, reír, llorar, sentarse,
-enojarse, patalear, brazos cruzados, pensar, encogerse de hombros, mano a la cara, timidez, presumir,
-reverencia, saludo militar, señalar y bostezar.
+Repertorio (41): bailar, baile robot, perreo, saltar de alegría, saludar, aplaudir, celebrar, reír, llorar,
+sentarse, mirar el horizonte, acostarse, meditar, enojarse, patalear, golpear el suelo, brazos cruzados, pensar,
+encogerse de hombros, mano a la cara, timidez, enamorado, beso al aire, suplicar, presumir, pose de héroe,
+pose sexy, derrotado bajo la lluvia, reverencia, saludo militar, señalar, ¡alto!, bostezar, dar un giro,
+voltereta mortal, entrenar puñetazos, caminar sigiloso (te agacha de verdad: lento y sin caer de los bordes),
+y las que usan **el objeto de tu mano**: comer, practicar con la espada, malabares y lanzar (lo tira de verdad, lejos).
 
 ### Idiomas
 
-Español e inglés, según el idioma del juego. El español sirve para todas las variantes de Minecraft
-(es_es, es_mx, es_ar, es_cl, es_ec, es_uy, es_ve).
+Español e inglés, según el idioma del juego (todas las variantes de español de Minecraft).
 
 ## Instalar
 
 1. Instala NeoForge 21.1.x para Minecraft 1.21.1.
-2. Copia `build/libs/interacciones-1.0.0.jar` a la carpeta `mods/` **del cliente y del servidor** (el mod es obligatorio en ambos lados).
+2. Copia `build/libs/interacciones-1.0.0.jar` a la carpeta `mods/` **del cliente y del servidor** (obligatorio en ambos).
 
 ## Configuración
 
-**Servidor** — `config/interacciones-server.toml` (se crea al primer arranque y se sincroniza a los clientes):
+**Servidor** — `config/interacciones-server.toml` (se sincroniza a los clientes):
 
 | Clave | Por defecto | Qué hace |
 |---|---|---|
 | `permitirForzar` | `true` | Si es `false`, el modo Forzar desaparece de la rueda y el servidor lo rechaza. |
-| `distanciaMaxima` | `2.5` | Bloques máximos para pedir o entregar; al ocurrir se acercan solos hasta tocarse. |
+| `permitirGolpes` | `true` | Si es `false`, no se pueden hacer golpes ni bromas sin permiso. |
+| `distanciaMaxima` | `2.5` | Bloques máximos para pedir o entregar; al ocurrir se acercan solos. |
 | `segundosParaResponder` | `15` | Tiempo para aceptar o rechazar. |
 | `segundosEntreInteracciones` | `3` | Espera mínima entre peticiones del mismo jugador. |
 
-**Cliente** — `config/interacciones-client.toml`: `ruletaEmociones`, las 8 casillas de tu ruleta
-(mejor editarla desde el juego con `G` → `E`).
+**Cliente** — `config/interacciones-client.toml`: `ruletaEmociones` y `ruedaInteracciones` (mejor desde el juego con `E`).
 
 Las teclas (aceptar, rechazar, ruleta) se cambian en *Opciones → Controles → Interacciones amistosas*.
 
@@ -92,10 +82,8 @@ export JAVA_HOME="$(mise where java)"
 ./gradlew runServer    # servidor dedicado de pruebas (run/, online-mode=false)
 ```
 
-**Probar con dos jugadores:** arranca `runServer`, y en dos terminales
-`./gradlew runClient --args="--username Ana"` y `./gradlew runClient --args="--username Beto"`;
-conecta ambos a `localhost`. (Con la caché de configuración de Gradle puede hacer falta
-lanzar el segundo cliente con `--no-configuration-cache`.)
+**Probar con dos jugadores:** `runServer`, y en dos terminales `./gradlew runClient --args="--username Ana"` y
+`--username Beto`; conecta ambos a `localhost` (puede hacer falta `--no-configuration-cache` en el segundo).
 
 ## Mapa del código
 
@@ -104,93 +92,91 @@ lanzar el segundo cliente con `--no-configuration-cache`.)
 | Carpeta / archivo | Qué hace |
 |---|---|
 | `InteraccionesAmistosas.java` | Punto de entrada: registra configuraciones, red y eventos del servidor. |
-| `Configuracion.java` | Reglas del servidor (forzar, distancia, tiempos). |
-| `ConfiguracionCliente.java` | La ruleta de emociones de cada jugador. |
+| `Configuracion.java` | Reglas del servidor (forzar, golpes, distancia, tiempos). |
+| `ConfiguracionCliente.java` | Las dos ruedas de cada jugador (emociones e interacciones). |
 | `NombreObjeto.java` | Cómo se nombra un objeto en los textos ("3× Diamante"). |
 | `dominio/` | Lógica pura, sin Minecraft, con tests. |
-| `dominio/TipoInteraccion.java` | Gestos de la rueda y entregas: duración, distancia de contacto, claves de texto. |
+| `dominio/TipoInteraccion.java` | **Tabla de interacciones**: duración, distancia, clase, disposición, daño, empuje. |
+| `dominio/ClaseInteraccion.java`, `Disposicion.java` | Gesto / sin permiso / entrega; cara a cara / por detrás. |
 | `dominio/TipoEmocion.java` | Emociones: duración, si se repiten, si están en el repertorio. |
 | `dominio/ModoPeticion.java` | Pedir o Forzar. |
 | `dominio/RegistroSolicitudes.java` | Solicitudes pendientes, caducidad y enfriamiento. |
 | `dominio/ResultadoPeticion.java` | Motivos de aceptación/rechazo. |
-| `dominio/Acercamiento.java` | Dónde queda cada jugador para tocarse y el trayecto del deslizamiento. |
-| `animacion/` | Motor de fotogramas clave, lógica pura con tests. |
-| `animacion/CatalogoAnimaciones.java` | **La coreografía de cada gesto entre dos** (actor y receptor). |
-| `animacion/CatalogoEmociones.java` | **La coreografía de cada emoción** (y las poses de ofrecer). |
-| `animacion/Postura.java`, `Giro.java` | Una pose: peso, cabeza, torso, brazos, piernas, elevación (convenciones en la cabecera). |
-| `animacion/Animacion.java`, `Fotograma.java`, `Suavizado.java`, `Papel.java` | Secuencia, pose clave, curvas de velocidad y papel. |
-| `red/` | Los 9 paquetes de red y su registro (`RegistroRed`). |
-| `servidor/GestorSolicitudes.java` | Valida peticiones, gestiona el consentimiento, caduca solicitudes. |
-| `servidor/GestorEntregas.java` | Ofertas de objetos y el traspaso de un inventario a otro. |
-| `servidor/EmocionesEnCurso.java` | Emociones de cada jugador; las corta si se mueve. |
-| `servidor/PlanAcercamiento.java` | Comprueba si pueden juntarse (paredes, altura, estado) y calcula destinos. |
-| `servidor/InteraccionesEnCurso.java` | Fases de cada gesto: acercar, animar, entregar el objeto, cortar si se separan. |
-| `servidor/EjecutorInteraccion.java` | Empieza o corta el gesto en los clientes; partículas y sonido. |
+| `dominio/Acercamiento.java` | Dónde queda cada jugador, el trayecto del deslizamiento y hacia dónde mira. |
+| `animacion/` | Motor de fotogramas clave y coreografías, lógica pura con tests. |
+| `animacion/CatalogoAnimaciones.java` | Registro: qué coreografía anima a cada papel en cada interacción (y forzada). |
+| `animacion/GestosAfectuosos.java`, `GolpesYBromas.java`, `Entregas.java`, `ReaccionesForzadas.java` | **Coreografías de las interacciones.** |
+| `animacion/CatalogoEmociones.java` | Registro de emociones (y las primeras coreografías). |
+| `animacion/EmocionesConObjeto.java`, `EmocionesDeCuerpoEntero.java`, `EmocionesDePose.java` | **Coreografías de las emociones nuevas.** |
+| `animacion/MomentosEmocion.java`, `ObjetoLanzado.java` | Momentos de efecto y vuelo del objeto, compartidos con el servidor. |
+| `animacion/Postura.java`, `Giro.java` | Una pose: piezas, elevación, vuelta y voltereta (convenciones en la cabecera). |
+| `animacion/Animacion.java`, `Fotograma.java`, `Suavizado.java`, `Papel.java` | Secuencia, pose clave, curvas y papel. |
+| `red/` | Los paquetes de red y su registro (`RegistroRed`). |
+| `servidor/GestorSolicitudes.java` | Valida peticiones, consentimiento, caducidad. |
+| `servidor/GestorEntregas.java` | Ofertas de objetos y el traspaso de inventario. |
+| `servidor/EmocionesEnCurso.java` | Emociones de cada jugador; las reenvía a quien empieza a verlo. |
+| `servidor/EfectosEmocion.java` | Partículas, sonidos, comer y lanzar de cada emoción. |
+| `servidor/PlanAcercamiento.java` | Comprueba si pueden juntarse (paredes, altura, estado). |
+| `servidor/InteraccionesEnCurso.java` | Fases de cada interacción: acercar, animar, contacto (entrega o golpe), cortar. |
+| `servidor/EjecutorInteraccion.java` | Empieza o corta el gesto en los clientes; daño, retroceso, partículas y sonido. |
 | `servidor/AvisosJugador.java` | Mensajes en la barra de acción. |
 | `cliente/ClicEnJugador.java` | Clic derecho sobre un jugador: rueda (mano vacía) u ofrecer (con objeto). |
-| `cliente/RuedaRadial.java` | Base de las ruedas: anillo, centro, ratón y teclado. |
-| `cliente/PantallaRueda.java` | Rueda de gestos (Pedir / Forzar). |
-| `cliente/PantallaRuedaEmociones.java` | Ruleta de emociones. |
-| `cliente/PantallaRepertorio.java` | Editor de la ruleta. |
-| `cliente/BarrasPantalla.java` | Barras superior e inferior comunes a las pantallas. |
-| `cliente/DibujoRueda.java` | Dibuja sectores y líneas del anillo con triángulos. |
-| `cliente/ColoresInterfaz.java` | Tokens de color (única fuente). |
-| `cliente/AvisoSolicitud.java` | Aviso "X quiere abrazarte" / "X te ofrece…" y respuesta con teclas. |
-| `cliente/SolicitudActual.java` | La solicitud pendiente de responder en este cliente. |
-| `cliente/TeclasInteraccion.java` | Teclas Aceptar / Rechazar / Ruleta. |
-| `cliente/AbrirRuedaEmociones.java` | Abre la ruleta al pulsar su tecla. |
-| `cliente/RegistroCliente.java` | Alta de teclas y de la capa del HUD. |
+| `cliente/RuedaRadial.java`, `PantallaRueda.java`, `PantallaRuedaEmociones.java` | Base de las ruedas y las dos ruedas. |
+| `cliente/PantallaRepertorio.java` | Editor genérico de cualquiera de las dos ruedas. |
+| `cliente/BarrasPantalla.java`, `DibujoRueda.java`, `ColoresInterfaz.java` | Barras, dibujo del anillo y tokens de color. |
+| `cliente/AvisoSolicitud.java`, `SolicitudActual.java` | Aviso "X quiere…" / "X te ofrece…" y respuesta con teclas. |
+| `cliente/TeclasInteraccion.java`, `AbrirRuedaEmociones.java`, `RegistroCliente.java` | Teclas, abrir la ruleta, altas del cliente. |
 | `cliente/ReceptorCliente.java` | Recibe los paquetes del servidor. |
 | `cliente/AnimacionesActivas.java` | Qué anima cada jugador, bucles y desvanecido al cortar. |
-| `cliente/PosesInteraccion.java` | Reinicia el modelo y le aplica la pose en curso. |
-| `mixin/PoseJugadorMixin.java` | Engancha `PosesInteraccion` al principio y al final de `PlayerModel.setupAnim`. |
+| `cliente/PosesInteraccion.java` | Reinicia el modelo y le aplica la pose (piezas). |
+| `cliente/TransformacionCuerpo.java` | Mueve el cuerpo entero al dibujar (elevación, vuelta, voltereta). |
+| `cliente/ObjetoEnElAire.java` | Dibuja el objeto volando en el malabar y oculta el de la mano. |
+| `cliente/SigiloAgachado.java` | Mantiene pulsado "agacharse" durante la emoción de sigilo. |
+| `mixin/PoseJugadorMixin.java` | Engancha `PosesInteraccion` a `PlayerModel.setupAnim`. |
+| `mixin/ObjetoEnManoMixin.java` | Deja de dibujar el objeto de la mano mientras vuela. |
 
-Recursos: `src/main/resources/assets/interacciones/lang/` (`es_es.json` y `en_us.json`; las demás variantes
-de español se copian de `es_es.json` al compilar, ver `build.gradle`), `interacciones.mixins.json`,
-y `src/main/templates/META-INF/neoforge.mods.toml` (metadatos del mod).
+Recursos: `src/main/resources/assets/interacciones/lang/` (`es_es.json` y `en_us.json`; el resto de variantes de español
+se copian al compilar), `interacciones.mixins.json` y `src/main/templates/META-INF/neoforge.mods.toml`.
 
 ## Flujo de datos
 
-Gestos y entregas:
+Interacciones y entregas:
 
 ```
 [Cliente A] clic derecho → ClicEnJugador ─┬─ mano vacía → PantallaRueda ──PedirInteraccion──┐
                                            └─ con objeto ──────────────────OfrecerObjeto────┤
                                                                                              ▼
                                    [Servidor] GestorSolicitudes (+ GestorEntregas para objetos)
-                                     valida: distancia, enfriamiento, forzar, PlanAcercamiento
-                                     (entrega: EmocionesEnCurso pone a A a ofrecer)
-                     modo PEDIR ──SolicitudRecibida──▶ [Cliente B] AvisoSolicitud ──ResponderSolicitud (Y/N)──┐
-                     modo FORZAR ─────────────────────────────────────────────────────────────────────────┤
-                                                                                                           ▼
+                                     valida: golpes/forzar permitidos, distancia, enfriamiento, PlanAcercamiento
+                     gesto en modo PEDIR / entrega ──SolicitudRecibida──▶ [Cliente B] AvisoSolicitud ──Y/N──┐
+                     modo FORZAR o golpe ────────────────────────────────────────────────────────────────┤
+                                                                                                          ▼
                                    InteraccionesEnCurso: ACERCANDO (6 ticks) → ACTUANDO
-                                     (entrega: GestorEntregas.entregar a mitad del gesto)
-            ◀──ReproducirInteraccion / DetenerAnimacion── AnimacionesActivas → PosesInteraccion ← CatalogoAnimaciones
+                                     contacto: GestorEntregas.entregar o EjecutorInteraccion.impactar
+            ◀──ReproducirInteraccion(forzada) / DetenerAnimacion── AnimacionesActivas ← CatalogoAnimaciones
+                                                                    → PosesInteraccion + TransformacionCuerpo
 ```
 
 Emociones:
 
 ```
-G → PantallaRuedaEmociones ──HacerEmocion / DetenerMiEmocion──▶ EmocionesEnCurso (corta si te mueves)
-            ◀──ReproducirEmocion / DetenerAnimacion── AnimacionesActivas → PosesInteraccion ← CatalogoEmociones
+G → PantallaRuedaEmociones ──HacerEmocion / DetenerMiEmocion──▶ EmocionesEnCurso → EfectosEmocion (partículas)
+            ◀──ReproducirEmocion / DetenerAnimacion── AnimacionesActivas ← CatalogoEmociones
+                                       → PosesInteraccion, TransformacionCuerpo, ObjetoEnElAire, SigiloAgachado
 ```
 
 ## Cómo cambiar…
 
-- **Añadir un gesto a la rueda:** nuevo valor en `TipoInteraccion` (clave, duración, distancia de contacto,
-  `false`), su coreografía en `CatalogoAnimaciones`, su caso en `EjecutorInteraccion.particulaDe` y `sonidoDe`
-  (el compilador avisa si falta), y sus 4 textos (`nombre`, `pedido`, `hiciste`, `recibiste`) en
-  `es_es.json` y `en_us.json` (un test avisa si falta alguno).
-- **Añadir una emoción al repertorio:** nuevo valor en `TipoEmocion` (clave, duración, cíclica, `true`), su caso en
-  `CatalogoEmociones.crear` y su texto `emocion.interacciones.<clave>` en los dos idiomas. Un test comprueba que
-  las cíclicas cierren el bucle y las demás vuelvan al reposo.
-- **Cambiar una animación:** sus fotogramas en `CatalogoAnimaciones` o `CatalogoEmociones` (momento 0..1, curva y pose).
-  Los ángulos son radianes; las convenciones están en la cabecera de `Postura.java`.
-- **Cambiar la ruleta por defecto:** `RULETA_POR_DEFECTO` en `ConfiguracionCliente`.
+- **Añadir una interacción:** una fila en `TipoInteraccion` (clave, duración, distancia, clase, disposición, daño,
+  empuje), su coreografía en el archivo del tema y su registro en `CatalogoAnimaciones`, sus casos en
+  `EjecutorInteraccion.particulaDe` y `sonidoDe` (el compilador avisa), y sus 4 textos (`nombre`, `pedido`, `hiciste`,
+  `recibiste`) en los dos idiomas (un test avisa si falta alguno). Si es un gesto con permiso, puedes darle una
+  reacción forzada en `ReaccionesForzadas` (si no, usa la normal).
+- **Añadir una emoción:** una fila en `TipoEmocion`, su caso en `CatalogoEmociones.crear`, su texto
+  `emocion.interacciones.<clave>` y, si quieres, partículas en `EfectosEmocion.alAvanzar`.
+- **Cambiar el daño o el empuje de un golpe:** columnas de `TipoInteraccion` (2 de daño = un corazón).
+- **Cambiar una animación:** sus fotogramas (momento 0..1, curva y pose). Convenciones en la cabecera de `Postura.java`.
+- **Cambiar las ruedas por defecto:** `RULETA_POR_DEFECTO` y `RUEDA_POR_DEFECTO` en `ConfiguracionCliente`.
 - **Cambiar qué cuenta como flor:** `ItemTags.FLOWERS` en `GestorEntregas.alOfrecer`.
-- **Cambiar lo cerca que quedan:** `distanciaContacto` en `TipoInteraccion` (bloques entre centros; por
-  debajo de 0.6 los cuerpos se empujan). Si cambias mucho una, revisa los brazos en el catálogo.
-- **Cambiar colores de la interfaz:** solo en `ColoresInterfaz`.
-- **Cambiar textos:** `lang/es_es.json` y `lang/en_us.json`.
-- **Cambiar las reglas por defecto:** `Configuracion.java`.
+- **Cambiar colores:** solo en `ColoresInterfaz`. **Textos:** `lang/es_es.json` y `lang/en_us.json`.
 - **Cambiar el formato de un paquete:** súbelo en `RegistroRed.VERSION_PROTOCOLO`.

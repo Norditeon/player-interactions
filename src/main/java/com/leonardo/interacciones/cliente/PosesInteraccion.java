@@ -4,6 +4,8 @@
 //     compartido por todos los jugadores y Minecraft no reinicia todo (p. ej. el ladeo de la
 //     cabeza), así que sin esto un gesto se quedaba "pegado" en ese y en otros jugadores.
 //   - al final (aplicar): mezcla la pose de Minecraft con la del gesto según su peso.
+// El movimiento del cuerpo entero (elevación, vuelta, voltereta) no va aquí: lo hace
+// TransformacionCuerpo al dibujar, para que lo sigan también la armadura y el objeto en la mano.
 package com.leonardo.interacciones.cliente;
 
 import com.leonardo.interacciones.animacion.Giro;
@@ -34,9 +36,9 @@ public final class PosesInteraccion {
         if (edadEnTicks == 0) {
             return;
         }
-        AnimacionesActivas.de(entidad, edadEnTicks).ifPresent(animacion -> {
-            Postura postura = animacion.animacion().posturaEn(animacion.progreso(edadEnTicks));
-            float peso = postura.peso() * animacion.intensidad(edadEnTicks);
+        AnimacionesActivas.poseDe(entidad, edadEnTicks).ifPresent(pose -> {
+            Postura postura = pose.postura();
+            float peso = postura.peso();
             if (peso <= 0) {
                 return;
             }
@@ -46,19 +48,8 @@ public final class PosesInteraccion {
             girar(modelo.leftArm, postura.brazoIzquierdo(), peso);
             girar(modelo.rightLeg, postura.piernaDerecha(), peso);
             girar(modelo.leftLeg, postura.piernaIzquierda(), peso);
-            elevar(modelo, postura.elevacion() * peso);
             copiarCapasExteriores(modelo);
         });
-    }
-
-    /** Sube o baja el cuerpo entero (saltar, sentarse) moviendo todas las piezas a la vez. */
-    private static void elevar(PlayerModel<?> m, float pixeles) {
-        if (pixeles == 0) {
-            return;
-        }
-        for (ModelPart parte : new ModelPart[]{m.head, m.body, m.rightArm, m.leftArm, m.rightLeg, m.leftLeg}) {
-            parte.y += pixeles;
-        }
     }
 
     /**

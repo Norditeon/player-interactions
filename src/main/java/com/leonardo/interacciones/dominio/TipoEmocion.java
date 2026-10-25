@@ -32,13 +32,33 @@ public enum TipoEmocion {
     SALUDO_MILITAR("saludo_militar", 40, false, true),
     SENALAR("senalar", 30, false, true),
     BOSTEZAR("bostezar", 50, false, true),
+    ENAMORADO("enamorado", 40, true, true),
+    BESO_AL_AIRE("beso_al_aire", 30, false, true),
+    SUPLICAR("suplicar", 30, true, true),
+    GIRO("giro", 20, false, true),
+    MORTAL("mortal", 24, false, true),
+    ENTRENAR_PUNOS("entrenar_punos", 12, true, true),
+    COMER("comer", 16, true, true),
+    PRACTICAR_ESPADA("practicar_espada", 20, true, true),
+    SIGILO("sigilo", 40, true, true),
+    MALABAR("malabar", 30, true, true),
+    DETENER_ALTO("detener_alto", 30, true, true),
+    SENTARSE_HORIZONTE("sentarse_horizonte", 80, true, true),
+    LANZAR("lanzar", 24, false, true),
+    PERREO("perreo", 10, true, true),
+    POSE_SEXY("pose_sexy", 60, true, true),
+    POSE_HEROE("pose_heroe", 60, true, true),
+    LLUVIA_DERROTADO("lluvia_derrotado", 60, true, true),
+    GOLPEAR_SUELO("golpear_suelo", 20, true, true),
+    MEDITAR("meditar", 60, true, true),
+    ACOSTARSE("acostarse", 80, true, true),
     OFRECER_OBJETO("ofrecer_objeto", 40, true, false),
     OFRECER_FLOR("ofrecer_flor", 40, true, false);
 
     /** Identificador estable: se guarda en la configuración y en las claves de traducción. */
     private final String clave;
     private final int duracionTicks;
-    /** Se repite hasta que el jugador la corta o se mueve. */
+    /** Se repite hasta que el jugador la corta (aunque camine). */
     private final boolean ciclica;
     /** Aparece en el repertorio; las no elegibles solo las lanza el servidor. */
     private final boolean elegible;

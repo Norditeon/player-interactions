@@ -23,7 +23,7 @@ public final class ReceptorCliente {
         Entity actor = entidad(interaccion.idEntidadActor());
         Entity receptor = entidad(interaccion.idEntidadReceptor());
         if (actor != null && receptor != null) {
-            AnimacionesActivas.iniciarInteraccion(actor, receptor, interaccion.tipo());
+            AnimacionesActivas.iniciarInteraccion(actor, receptor, interaccion.tipo(), interaccion.forzada());
         }
     }
 

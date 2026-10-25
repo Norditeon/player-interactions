@@ -10,9 +10,18 @@ Paquete `com.leonardo.interacciones`, mod id `interacciones`. Mapa del código y
 - Entregas (`TipoInteraccion.entregaObjeto()`): `GestorEntregas` guarda la oferta ligada a (dador, receptor) y pone al
   dador la emoción OFRECER_*; el objeto cambia de inventario en `InteraccionesEnCurso` al llegar a `MOMENTO_ENTREGA`,
   que coincide con el fotograma de `CatalogoAnimaciones` donde se juntan las manos.
-- Emociones: `EmocionesEnCurso` (servidor, una por jugador; las elegibles se cortan al moverse) → `ReproducirEmocion`.
-  En el cliente todo pasa por `AnimacionesActivas` (gestos, emociones, bucles y desvanecido al cortar).
-- La ruleta de cada jugador vive en `ConfiguracionCliente` (config CLIENT, claves de `TipoEmocion`).
+- `TipoInteraccion` es una tabla: clase (GESTO pide permiso, SIN_PERMISO nunca pregunta, ENTREGA), disposición
+  (POR_DETRAS deja al receptor de espaldas), daño y empuje aplicados en `MOMENTO_CONTACTO` (`EjecutorInteraccion.impactar`,
+  daño vía `playerAttack` para respetar PvP). Tras un golpe, separarse no corta la reacción.
+- Forzado: `ReproducirInteraccion.forzada` → `CatalogoAnimaciones.de(tipo, papel, forzada)` usa `ReaccionesForzadas` para el receptor.
+- Emociones: `EmocionesEnCurso` (servidor, una por jugador; NO se cortan al moverse, se reenvían en `StartTracking`)
+  → `ReproducirEmocion`; `EfectosEmocion` hace partículas/sonidos/lanzar con los momentos de `MomentosEmocion`/`ObjetoLanzado`.
+  En el cliente todo pasa por `AnimacionesActivas.poseDe` (gestos, emociones, bucles y desvanecido al cortar).
+- Cuerpo entero (elevación, vuelta, voltereta) se aplica en `TransformacionCuerpo` (RenderPlayerEvent, prioridad LOWEST
+  en Pre para no desequilibrar la pila si otro mod cancela). Los giros se escalan solo con la intensidad de entrada/salida,
+  no con el peso: las vueltas terminan en 2π.
+- Las dos ruedas de cada jugador viven en `ConfiguracionCliente` (config CLIENT, claves); `PantallaRepertorio<T>` edita
+  cualquiera vía `Coleccion`.
 - `red/`: records `CustomPacketPayload` + `StreamCodec`. Los enums viajan por índice (`CodecsDominio`).
 - `servidor/`: autoridad. Todo se valida aquí (distancia, enfriamiento, `permitirForzar`); el cliente nunca decide.
 - `cliente/`: rueda (`Screen` propio), aviso en HUD (`RegisterGuiLayersEvent`), animaciones.
@@ -20,6 +29,7 @@ Paquete `com.leonardo.interacciones`, mod id `interacciones`. Mapa del código y
 - `mixin/PoseJugadorMixin`: inyecta en `PlayerModel.setupAnim` HEAD (`resetPose` de todas las piezas: el modelo es
   compartido entre jugadores y vainilla no reinicia `head.zRot` ni posiciones de torso) y TAIL (aplica la pose de
   `CatalogoAnimaciones`). Tras modificar piezas hay que copiar capas exteriores. `edadEnTicks == 0` = mano en primera persona.
+- `mixin/ObjetoEnManoMixin`: HEAD cancelable de `ItemInHandLayer.renderArmWithItem` para ocultar el objeto que vuela.
 - `ServerGamePacketListenerImpl.teleport`: x/y/z son SIEMPRE absolutos en el servidor; las banderas relativas solo
   afectan al paquete al cliente (pasar 0,0,0 manda al jugador a las coordenadas 0 0 0).
 

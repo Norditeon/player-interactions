@@ -11,6 +11,16 @@ public record Animacion(List<Fotograma> fotogramas) {
         return new Animacion(List.of(fotogramas));
     }
 
+    /** Vuelta cíclica: las poses se reparten a partes iguales y al final se vuelve a la primera. */
+    public static Animacion ciclo(Suavizado curva, Postura... poses) {
+        Fotograma[] fotogramas = new Fotograma[poses.length + 1];
+        for (int i = 0; i < poses.length; i++) {
+            fotogramas[i] = Fotograma.en((float) i / poses.length, i == 0 ? Suavizado.LINEAL : curva, poses[i]);
+        }
+        fotogramas[poses.length] = Fotograma.en(1, curva, poses[0]);
+        return de(fotogramas);
+    }
+
     /** Pose para un progreso 0..1, mezclando los dos fotogramas que lo rodean. */
     public Postura posturaEn(float progreso) {
         Fotograma anterior = fotogramas.get(0);

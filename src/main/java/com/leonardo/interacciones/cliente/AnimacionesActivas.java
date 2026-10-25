@@ -1,13 +1,15 @@
 // Qué animación está haciendo cada jugador ahora mismo (un gesto entre dos o una emoción),
 // desde cuándo y si se está cortando. La rellena y vacía ReceptorCliente (paquetes del
-// servidor); la consulta PosesInteraccion en cada fotograma. El tiempo se mide con el
-// tickCount de cada entidad para que la animación vaya sincronizada con su movimiento.
+// servidor); la consultan en cada fotograma PosesInteraccion (piezas del modelo),
+// TransformacionCuerpo (cuerpo entero), ObjetoEnElAire y SigiloAgachado. El tiempo se mide
+// con el tickCount de cada entidad para que la animación vaya sincronizada con su movimiento.
 package com.leonardo.interacciones.cliente;
 
 import com.leonardo.interacciones.animacion.Animacion;
 import com.leonardo.interacciones.animacion.CatalogoAnimaciones;
 import com.leonardo.interacciones.animacion.CatalogoEmociones;
 import com.leonardo.interacciones.animacion.Papel;
+import com.leonardo.interacciones.animacion.Postura;
 import com.leonardo.interacciones.dominio.TipoEmocion;
 import com.leonardo.interacciones.dominio.TipoInteraccion;
 import java.util.HashMap;
@@ -21,7 +23,20 @@ final class AnimacionesActivas {
     private static final float TICKS_TRANSICION = 5;
     private static final int SIN_CORTAR = -1;
 
-    record EnCurso(Animacion animacion, int duracionTicks, boolean ciclica, int tickInicio, int tickCorte) {
+    /**
+     * La pose de este instante. postura.peso() ya incluye la entrada/salida suave; intensidad es
+     * solo esa entrada/salida (los giros del cuerpo entero la usan sin el peso del fotograma).
+     * emocion es null si es un gesto entre dos.
+     */
+    record Pose(Postura postura, float intensidad, TipoEmocion emocion, float progreso) {
+
+        boolean mueveElCuerpo() {
+            return postura.elevacion() != 0 || postura.vuelta() != 0 || postura.voltereta() != 0;
+        }
+    }
+
+    private record EnCurso(Animacion animacion, int duracionTicks, boolean ciclica, TipoEmocion emocion,
+                           int tickInicio, int tickCorte) {
 
         /** 0..1 dentro de la animación (o de la vuelta actual, si es cíclica). */
         float progreso(float edadEnTicks) {
@@ -29,7 +44,7 @@ final class AnimacionesActivas {
             return ciclica ? vueltas - (float) Math.floor(vueltas) : vueltas;
         }
 
-        /** Multiplica el peso de la pose: sube al entrar en un bucle y baja al cortar. */
+        /** Sube al entrar en un bucle y baja al cortar. */
         float intensidad(float edadEnTicks) {
             float entrada = ciclica ? Math.min(1, (edadEnTicks - tickInicio) / TICKS_TRANSICION) : 1;
             float salida = tickCorte == SIN_CORTAR ? 1 : 1 - (edadEnTicks - tickCorte) / TICKS_TRANSICION;
@@ -51,13 +66,13 @@ final class AnimacionesActivas {
     private AnimacionesActivas() {
     }
 
-    static void iniciarInteraccion(Entity actor, Entity receptor, TipoInteraccion tipo) {
-        iniciar(actor, CatalogoAnimaciones.de(tipo, Papel.ACTOR), tipo.duracionTicks(), false);
-        iniciar(receptor, CatalogoAnimaciones.de(tipo, Papel.RECEPTOR), tipo.duracionTicks(), false);
+    static void iniciarInteraccion(Entity actor, Entity receptor, TipoInteraccion tipo, boolean forzada) {
+        iniciar(actor, CatalogoAnimaciones.de(tipo, Papel.ACTOR, forzada), tipo.duracionTicks(), false, null);
+        iniciar(receptor, CatalogoAnimaciones.de(tipo, Papel.RECEPTOR, forzada), tipo.duracionTicks(), false, null);
     }
 
     static void iniciarEmocion(Entity entidad, TipoEmocion tipo) {
-        iniciar(entidad, CatalogoEmociones.de(tipo), tipo.duracionTicks(), tipo.ciclica());
+        iniciar(entidad, CatalogoEmociones.de(tipo), tipo.duracionTicks(), tipo.ciclica(), tipo);
     }
 
     /** No la quita de golpe: la deja desvanecerse unos ticks. */
@@ -65,21 +80,32 @@ final class AnimacionesActivas {
         EnCurso actual = POR_ENTIDAD.get(entidad.getId());
         if (actual != null && actual.tickCorte() == SIN_CORTAR) {
             POR_ENTIDAD.put(entidad.getId(), new EnCurso(actual.animacion(), actual.duracionTicks(),
-                    actual.ciclica(), actual.tickInicio(), entidad.tickCount));
+                    actual.ciclica(), actual.emocion(), actual.tickInicio(), entidad.tickCount));
         }
     }
 
-    /** La animación en curso de la entidad; las terminadas se borran al consultarlas. */
-    static Optional<EnCurso> de(Entity entidad, float edadEnTicks) {
+    /** La pose en curso de la entidad; las animaciones terminadas se borran al consultarlas. */
+    static Optional<Pose> poseDe(Entity entidad, float edadEnTicks) {
         EnCurso animacion = POR_ENTIDAD.get(entidad.getId());
-        if (animacion != null && animacion.terminada(edadEnTicks)) {
+        if (animacion == null) {
+            return Optional.empty();
+        }
+        if (animacion.terminada(edadEnTicks)) {
             POR_ENTIDAD.remove(entidad.getId());
             return Optional.empty();
         }
-        return Optional.ofNullable(animacion);
+        float progreso = animacion.progreso(edadEnTicks);
+        float intensidad = animacion.intensidad(edadEnTicks);
+        Postura postura = animacion.animacion().posturaEn(progreso);
+        return Optional.of(new Pose(postura.conPeso(postura.peso() * intensidad), intensidad, animacion.emocion(), progreso));
     }
 
-    private static void iniciar(Entity entidad, Animacion animacion, int duracionTicks, boolean ciclica) {
-        POR_ENTIDAD.put(entidad.getId(), new EnCurso(animacion, duracionTicks, ciclica, entidad.tickCount, SIN_CORTAR));
+    static Optional<TipoEmocion> emocionDe(Entity entidad) {
+        return poseDe(entidad, entidad.tickCount).map(Pose::emocion);
+    }
+
+    private static void iniciar(Entity entidad, Animacion animacion, int duracionTicks, boolean ciclica, TipoEmocion emocion) {
+        POR_ENTIDAD.put(entidad.getId(),
+                new EnCurso(animacion, duracionTicks, ciclica, emocion, entidad.tickCount, SIN_CORTAR));
     }
 }

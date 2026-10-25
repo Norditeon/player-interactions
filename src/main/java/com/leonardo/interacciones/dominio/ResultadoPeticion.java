@@ -14,7 +14,8 @@ public enum ResultadoPeticion {
     DISTINTA_ALTURA("distinta_altura"),
     SIN_ESPACIO("sin_espacio"),
     SIN_OBJETO("sin_objeto"),
-    ENTREGA_FALLIDA("entrega_fallida");
+    ENTREGA_FALLIDA("entrega_fallida"),
+    GOLPES_DESACTIVADOS("golpes_desactivados");
 
     private final String clave;
 

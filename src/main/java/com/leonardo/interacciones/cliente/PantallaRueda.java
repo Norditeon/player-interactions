@@ -1,9 +1,12 @@
 // Rueda de interacciones que se abre al hacer clic derecho con la mano vacía sobre un jugador.
-// La abre ClicEnJugador; al elegir un gesto envía PedirInteraccion al servidor y se cierra.
-// El centro (o Tab) alterna entre Pedir y Forzar, si el servidor permite forzar.
+// La abre ClicEnJugador; al elegir una opción envía PedirInteraccion al servidor y se cierra.
+// Sus 8 casillas las elige el jugador (ConfiguracionCliente; E abre PantallaRepertorio).
+// El centro (o Tab) alterna entre Pedir y Forzar; los golpes y bromas se marcan en el color
+// destructivo porque ocurren sin preguntar, sea cual sea el modo.
 package com.leonardo.interacciones.cliente;
 
 import com.leonardo.interacciones.Configuracion;
+import com.leonardo.interacciones.ConfiguracionCliente;
 import com.leonardo.interacciones.dominio.ModoPeticion;
 import com.leonardo.interacciones.dominio.TipoInteraccion;
 import com.leonardo.interacciones.red.PedirInteraccion;
@@ -16,15 +19,23 @@ import org.lwjgl.glfw.GLFW;
 
 final class PantallaRueda extends RuedaRadial {
 
-    private static final List<TipoInteraccion> OPCIONES = TipoInteraccion.deLaRueda();
-
     private final Player objetivo;
+    private final List<TipoInteraccion> casillas = ConfiguracionCliente.ruedaInteracciones();
     private final boolean puedeForzar = Configuracion.forzarPermitido();
     private ModoPeticion modo = ModoPeticion.PEDIR;
 
     PantallaRueda(Player objetivo) {
         super(Component.translatable("interacciones.rueda.titulo", objetivo.getDisplayName()));
         this.objetivo = objetivo;
+    }
+
+    /** Lo que edita PantallaRepertorio para esta rueda; al volver, la rueda sigue apuntando al mismo jugador. */
+    static PantallaRepertorio.Coleccion<TipoInteraccion> coleccion(Player objetivo) {
+        return new PantallaRepertorio.Coleccion<>(
+                Component.translatable("interacciones.repertorio.titulo_rueda"),
+                TipoInteraccion.repertorio(), ConfiguracionCliente.ruedaInteracciones(),
+                ConfiguracionCliente::guardarRuedaInteracciones,
+                tipo -> Component.translatable(tipo.claveTraduccion("nombre")), () -> new PantallaRueda(objetivo));
     }
 
     @Override
@@ -39,17 +50,21 @@ final class PantallaRueda extends RuedaRadial {
 
     @Override
     protected int numeroSectores() {
-        return OPCIONES.size();
+        return casillas.size();
     }
 
     @Override
     protected Component etiqueta(int sector) {
-        return Component.translatable(OPCIONES.get(sector).claveTraduccion("nombre"));
+        TipoInteraccion tipo = casillas.get(sector);
+        return tipo == null ? null : Component.translatable(tipo.claveTraduccion("nombre"));
     }
 
     @Override
     protected void alElegir(int sector) {
-        PacketDistributor.sendToServer(new PedirInteraccion(objetivo.getId(), OPCIONES.get(sector), modo));
+        TipoInteraccion tipo = casillas.get(sector);
+        if (tipo != null) {
+            PacketDistributor.sendToServer(new PedirInteraccion(objetivo.getId(), tipo, modo));
+        }
         onClose();
     }
 
@@ -69,6 +84,10 @@ final class PantallaRueda extends RuedaRadial {
             modo = modo.alternar();
             return true;
         }
+        if (tecla == GLFW.GLFW_KEY_E && minecraft != null) {
+            minecraft.setScreen(new PantallaRepertorio<>(coleccion(objetivo)));
+            return true;
+        }
         return false;
     }
 
@@ -84,7 +103,9 @@ final class PantallaRueda extends RuedaRadial {
 
     @Override
     protected int colorDeSeleccion() {
-        return modo == ModoPeticion.FORZAR ? ColoresInterfaz.DESTRUCTIVO : ColoresInterfaz.ACENTO;
+        int sector = sectorBajoRaton();
+        boolean sinPermiso = sector >= 0 && casillas.get(sector) != null && !casillas.get(sector).requiereConsentimiento();
+        return sinPermiso || modo == ModoPeticion.FORZAR ? ColoresInterfaz.DESTRUCTIVO : ColoresInterfaz.ACENTO;
     }
 
     @Override
@@ -94,17 +115,19 @@ final class PantallaRueda extends RuedaRadial {
 
     @Override
     protected int colorEstadoCabecera() {
-        return puedeForzar ? colorDeSeleccion() : ColoresInterfaz.TEXTO_TENUE;
+        boolean forzando = puedeForzar && modo == ModoPeticion.FORZAR;
+        return forzando ? ColoresInterfaz.DESTRUCTIVO : puedeForzar ? ColoresInterfaz.ACENTO : ColoresInterfaz.TEXTO_TENUE;
     }
 
     @Override
     protected List<Atajo> atajos() {
         List<Atajo> atajos = new ArrayList<>(List.of(
-                new Atajo("1-" + OPCIONES.size(), "interacciones.atajo.elegir"),
+                new Atajo("1-" + casillas.size(), "interacciones.atajo.elegir"),
                 new Atajo("clic", "interacciones.atajo.confirmar")));
         if (puedeForzar) {
             atajos.add(new Atajo("tab", "interacciones.atajo.modo"));
         }
+        atajos.add(new Atajo("e", "interacciones.atajo.editar"));
         atajos.add(new Atajo("esc", "interacciones.atajo.cerrar"));
         return atajos;
     }

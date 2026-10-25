@@ -1,7 +1,9 @@
 // Interacciones que están ocurriendo ahora mismo, tick a tick, en dos fases:
 //   1. ACERCANDO: desliza a ambos jugadores hasta su distancia de contacto, cara a cara.
-//   2. ACTUANDO: el gesto se anima; si se separan a mitad, se corta para los dos. En las
-//      entregas, el objeto cambia de mano (GestorEntregas) cuando las manos se juntan.
+//   2. ACTUANDO: el gesto se anima; si se separan antes de tiempo, se corta para los dos. En
+//      el momento de contacto el objeto cambia de mano (entregas, GestorEntregas) o llega el
+//      golpe (EjecutorInteraccion.impactar).
+// En la disposición POR_DETRAS el receptor queda de espaldas a quien hace el gesto.
 // La arranca GestorSolicitudes con un PlanAcercamiento válido; al llegar al contacto pide a
 // EjecutorInteraccion que el gesto empiece (animación, partículas, sonido, mensajes).
 package com.leonardo.interacciones.servidor;
@@ -9,6 +11,7 @@ package com.leonardo.interacciones.servidor;
 import com.leonardo.interacciones.dominio.Acercamiento;
 import com.leonardo.interacciones.dominio.Acercamiento.Destinos;
 import com.leonardo.interacciones.dominio.Acercamiento.Posicion;
+import com.leonardo.interacciones.dominio.Disposicion;
 import com.leonardo.interacciones.dominio.TipoInteraccion;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -112,7 +115,7 @@ public final class InteraccionesEnCurso {
         Posicion posicionActor = Acercamiento.intermedia(enCurso.origenActor, enCurso.destinos.actor(), fraccion);
         Posicion posicionReceptor = Acercamiento.intermedia(enCurso.origenReceptor, enCurso.destinos.receptor(), fraccion);
         colocar(actor, posicionActor, enCurso.destinos.receptor(), receptor.getEyeHeight());
-        colocar(receptor, posicionReceptor, enCurso.destinos.actor(), actor.getEyeHeight());
+        colocar(receptor, posicionReceptor, haciaDondeMiraElReceptor(enCurso), actor.getEyeHeight());
         if (enCurso.ticksEnFase >= TICKS_ACERCAMIENTO) {
             enCurso.fase = Fase.ACTUANDO;
             enCurso.ticksEnFase = 0;
@@ -123,24 +126,41 @@ public final class InteraccionesEnCurso {
     }
 
     private static boolean actuar(EnCurso enCurso, ServerPlayer actor, ServerPlayer receptor) {
-        if (enCurso.ticksEnFase >= enCurso.tipo.duracionTicks()) {
+        TipoInteraccion tipo = enCurso.tipo;
+        if (enCurso.ticksEnFase >= tipo.duracionTicks()) {
             return true;
         }
-        double limite = enCurso.tipo.distanciaContacto() + MARGEN_SEPARACION;
-        if (actor.distanceToSqr(receptor) > limite * limite) {
+        int tickDeContacto = Math.round(tipo.duracionTicks() * TipoInteraccion.MOMENTO_CONTACTO);
+        // Tras un golpe el retroceso los separa a propósito: eso no corta la reacción.
+        boolean puedeSepararse = tipo.golpea() && enCurso.ticksEnFase > tickDeContacto;
+        double limite = tipo.distanciaContacto() + MARGEN_SEPARACION;
+        if (!puedeSepararse && actor.distanceToSqr(receptor) > limite * limite) {
             EjecutorInteraccion.detener(actor, receptor);
             return true;
         }
-        if (esMomentoDeEntregar(enCurso) && !GestorEntregas.entregar(actor, receptor, enCurso.tipo)) {
+        if (enCurso.ticksEnFase == tickDeContacto && !alContacto(actor, receptor, tipo)) {
             EjecutorInteraccion.detener(actor, receptor);
             return true;
         }
+        EjecutorInteraccion.duranteGesto(actor, receptor, tipo, enCurso.ticksEnFase);
         return false;
     }
 
-    private static boolean esMomentoDeEntregar(EnCurso enCurso) {
-        int tickDeEntrega = Math.round(enCurso.tipo.duracionTicks() * TipoInteraccion.MOMENTO_ENTREGA);
-        return enCurso.tipo.entregaObjeto() && enCurso.ticksEnFase == tickDeEntrega;
+    /** Lo que pasa cuando las manos (o el pie) llegan al otro. false = la interacción se cancela. */
+    private static boolean alContacto(ServerPlayer actor, ServerPlayer receptor, TipoInteraccion tipo) {
+        if (tipo.entregaObjeto()) {
+            return GestorEntregas.entregar(actor, receptor, tipo);
+        }
+        if (tipo.golpea()) {
+            EjecutorInteraccion.impactar(actor, receptor, tipo);
+        }
+        return true;
+    }
+
+    private static Posicion haciaDondeMiraElReceptor(EnCurso enCurso) {
+        return enCurso.tipo.disposicion() == Disposicion.POR_DETRAS
+                ? Acercamiento.puntoOpuesto(enCurso.destinos.actor(), enCurso.destinos.receptor())
+                : enCurso.destinos.actor();
     }
 
     private static void detenerSiEstabaActuando(EnCurso enCurso, ServerPlayer actor, ServerPlayer receptor) {

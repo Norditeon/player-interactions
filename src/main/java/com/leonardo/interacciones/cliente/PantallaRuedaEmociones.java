@@ -53,10 +53,18 @@ final class PantallaRuedaEmociones extends RuedaRadial {
     @Override
     protected boolean alPulsarTecla(int tecla) {
         if (tecla == GLFW.GLFW_KEY_E && minecraft != null) {
-            minecraft.setScreen(new PantallaRepertorio());
+            minecraft.setScreen(new PantallaRepertorio<>(coleccion()));
             return true;
         }
         return false;
+    }
+
+    /** Lo que edita PantallaRepertorio para esta ruleta. */
+    static PantallaRepertorio.Coleccion<TipoEmocion> coleccion() {
+        return new PantallaRepertorio.Coleccion<>(
+                Component.translatable("interacciones.repertorio.titulo"),
+                TipoEmocion.repertorio(), ConfiguracionCliente.ruleta(), ConfiguracionCliente::guardarRuleta,
+                tipo -> Component.translatable(tipo.claveTraduccion()), PantallaRuedaEmociones::new);
     }
 
     @Override

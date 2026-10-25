@@ -57,6 +57,11 @@ abstract class RuedaRadial extends Screen {
 
     protected abstract List<Atajo> atajos();
 
+    /** Sector bajo el ratón (0..n-1), o negativo si es el centro o nada. */
+    protected int sectorBajoRaton() {
+        return seleccion;
+    }
+
     /** Teclas propias de cada rueda (además de 1..n y Esc). true si la tecla se usó. */
     protected boolean alPulsarTecla(int tecla) {
         return false;

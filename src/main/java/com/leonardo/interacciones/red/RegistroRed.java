@@ -14,7 +14,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 public final class RegistroRed {
 
     /** Sube este número si cambia el formato de algún paquete: así cliente y servidor viejos no se mezclan. */
-    private static final String VERSION_PROTOCOLO = "3";
+    private static final String VERSION_PROTOCOLO = "4";
 
     private RegistroRed() {
     }

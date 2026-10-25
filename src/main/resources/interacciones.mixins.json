@@ -4,7 +4,8 @@
   "package": "com.leonardo.interacciones.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "PoseJugadorMixin"
+    "PoseJugadorMixin",
+    "ObjetoEnManoMixin"
   ],
   "injectors": {
     "defaultRequire": 1

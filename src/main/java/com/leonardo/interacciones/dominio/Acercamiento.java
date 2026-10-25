@@ -39,6 +39,14 @@ public final class Acercamiento {
                 new Posicion(medioX + haciaReceptorX * mitad, receptor.y(), medioZ + haciaReceptorZ * mitad));
     }
 
+    /**
+     * Punto al que mira quien está de espaldas (disposición POR_DETRAS): el reflejo de quien
+     * está detrás, al otro lado de él. Así le da la espalda a quien hace el gesto.
+     */
+    public static Posicion puntoOpuesto(Posicion detras, Posicion delante) {
+        return new Posicion(2 * delante.x() - detras.x(), delante.y(), 2 * delante.z() - detras.z());
+    }
+
     /** Punto del trayecto para una fracción 0..1, arrancando y frenando suave. */
     public static Posicion intermedia(Posicion desde, Posicion hasta, double fraccion) {
         double t = Math.max(0, Math.min(1, fraccion));

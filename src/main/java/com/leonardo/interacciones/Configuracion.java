@@ -13,6 +13,11 @@ public final class Configuracion {
             .comment("Si es false, nadie puede forzar interacciones: todas piden consentimiento.")
             .define("permitirForzar", true);
 
+    public static final ModConfigSpec.BooleanValue PERMITIR_GOLPES = CONSTRUCTOR
+            .comment("Si es false, no se pueden hacer golpes ni bromas sin permiso (cachetada, puñetazo,",
+                    "patada, nalgada, empujón). El daño respeta además el PvP del servidor.")
+            .define("permitirGolpes", true);
+
     public static final ModConfigSpec.DoubleValue DISTANCIA_MAXIMA = CONSTRUCTOR
             .comment("Distancia máxima en bloques para pedir una interacción. Al ocurrir, los",
                     "jugadores se acercan solos hasta tocarse.")
@@ -34,5 +39,9 @@ public final class Configuracion {
     /** En el cliente la config llega del servidor al conectarse; antes de eso se asume que no. */
     public static boolean forzarPermitido() {
         return ESPECIFICACION.isLoaded() && PERMITIR_FORZAR.get();
+    }
+
+    public static boolean golpesPermitidos() {
+        return ESPECIFICACION.isLoaded() && PERMITIR_GOLPES.get();
     }
 }
