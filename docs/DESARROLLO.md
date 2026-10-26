@@ -127,3 +127,10 @@ G → PantallaRuedaEmociones ──HacerEmocion / DetenerMiEmocion──▶ Emoc
 2. Ten tu token en `~/.gradle/gradle.properties` como `modrinthToken=mrp_...` (o en `MODRINTH_TOKEN`). Nunca en el repo.
 3. `./gradlew modrinth -PmodrinthPrueba` muestra lo que se enviaría sin subir nada.
 4. `./gradlew modrinth` compila y sube la versión al proyecto `mod_slug` y actualiza su descripción con el `README.md` (lo que esté entre `<!-- modrinth_exclude.start -->` y `.end -->` no se sube).
+5. Minotaur no envía el entorno, y Modrinth lo pide en cada versión. Márcala como "cliente y servidor" (el id sale en
+   la página de la versión o en la salida de la API):
+   ```sh
+   t=$(grep '^modrinthToken=' ~/.gradle/gradle.properties | cut -d= -f2-)
+   curl -X PATCH -H "Authorization: $t" -H 'Content-Type: application/json' \
+        -d '{"environment":"client_and_server"}' https://api.modrinth.com/v3/version/<id-de-la-version>
+   ```
