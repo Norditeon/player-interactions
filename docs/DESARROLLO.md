@@ -123,7 +123,7 @@ G → PantallaRuedaEmociones ──HacerEmocion / DetenerMiEmocion──▶ Emoc
 
 ## Publicar en Modrinth
 
-1. Sube `mod_version` en `gradle.properties`.
+1. Sube `mod_version` en `gradle.properties` y añade su sección `## <versión>` arriba en `CHANGELOG.md` (en inglés): es el changelog de Modrinth.
 2. Ten tu token en `~/.gradle/gradle.properties` como `modrinthToken=mrp_...` (o en `MODRINTH_TOKEN`). Nunca en el repo.
 3. `./gradlew modrinth -PmodrinthPrueba` muestra lo que se enviaría sin subir nada.
 4. `./gradlew modrinth` compila y sube la versión al proyecto `mod_slug` y actualiza su descripción con el `README.md` (lo que esté entre `<!-- modrinth_exclude.start -->` y `.end -->` no se sube).

@@ -194,6 +194,15 @@ tasks.named('processResources', ProcessResources).configure {
     }
 }
 
+// Devuelve el texto bajo "## <version>" en CHANGELOG.md, hasta la siguiente versión.
+static String notasDeVersion(String changelog, String version) {
+    def seccion = changelog.split(/(?m)^## /).find { it.startsWith(version + '\n') }
+    if (seccion == null) {
+        throw new GradleException("CHANGELOG.md no tiene una sección '## ${version}'")
+    }
+    return seccion.substring(version.length()).trim()
+}
+
 // Publicación en Modrinth con `./gradlew modrinth`. El token nunca va en el repo: se lee de
 // `modrinthToken` en ~/.gradle/gradle.properties o de la variable de entorno MODRINTH_TOKEN.
 // Con -PmodrinthPrueba no sube nada: solo muestra lo que enviaría.
@@ -203,6 +212,7 @@ modrinth {
     versionNumber = mod_version
     versionName = "${mod_name} ${mod_version}"
     versionType = 'release'
+    changelog = provider { notasDeVersion(file('CHANGELOG.md').text, mod_version) }
     uploadFile = tasks.named('jar')
     gameVersions = [minecraft_version]
     loaders = ['neoforge']
