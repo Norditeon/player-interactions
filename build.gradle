@@ -32,7 +32,7 @@ repositories {
 }
 
 base {
-    archivesName = mod_id
+    archivesName = mod_slug
 }
 
 // Mojang ships Java 21 to end users in 1.21.1, so mods should target Java 21.
@@ -199,7 +199,7 @@ tasks.named('processResources', ProcessResources).configure {
 // Con -PmodrinthPrueba no sube nada: solo muestra lo que enviaría.
 modrinth {
     token = providers.gradleProperty('modrinthToken').orElse(providers.environmentVariable('MODRINTH_TOKEN'))
-    projectId = modrinth_project_id
+    projectId = mod_slug
     versionNumber = mod_version
     versionName = "${mod_name} ${mod_version}"
     versionType = 'release'
@@ -207,8 +207,14 @@ modrinth {
     gameVersions = [minecraft_version]
     loaders = ['neoforge']
     debugMode = providers.gradleProperty('modrinthPrueba').isPresent()
+    // La descripción de Modrinth sale del README; lo marcado con modrinth_exclude no se sube.
+    syncBodyFrom = provider { file('README.md').text }
 }
 tasks.named('modrinth').configure {
+    notCompatibleWithConfigurationCache('Minotaur lee Task.project al ejecutarse')
+    dependsOn tasks.named('modrinthSyncBody')
+}
+tasks.named('modrinthSyncBody').configure {
     notCompatibleWithConfigurationCache('Minotaur lee Task.project al ejecutarse')
 }
 

@@ -10,7 +10,7 @@ Requiere **JDK 21** (`mise.toml` lo fija; `mise install` lo descarga). Gradle us
 
 ```sh
 export JAVA_HOME="$(mise where java)"
-./gradlew build        # compila, pasa los tests y genera build/libs/interacciones-1.0.0.jar
+./gradlew build        # compila, pasa los tests y genera build/libs/player-interactions-1.0.0.jar
 ./gradlew test         # solo los tests de la lógica pura
 ./gradlew runClient    # abre Minecraft con el mod
 ./gradlew runServer    # servidor dedicado de pruebas (run/, online-mode=false)
@@ -116,11 +116,14 @@ G → PantallaRuedaEmociones ──HacerEmocion / DetenerMiEmocion──▶ Emoc
 - **Añadir un idioma:** copia `en_us.json` con el código de Minecraft (p. ej. `pt_br.json`), tradúcelo y añádelo a
   `IDIOMAS` en `TraduccionesTest`, que comprueba que tenga todas las claves y los mismos `%s`.
 - **Cambiar el formato de un paquete:** súbelo en `RegistroRed.VERSION_PROTOCOLO`.
-- **Cambiar el nombre visible del mod:** `mod_name` en `gradle.properties` (y `key.categories.interacciones` en `lang/`).
+- **Cambiar el nombre visible del mod:** `mod_name` en `gradle.properties` (y `key.categories.interacciones` en `lang/`);
+  el del `.jar` y la dirección de Modrinth, `mod_slug`.
+- **Cambiar el icono:** edita `docs/icono.svg` (la rueda con los colores de `ColoresInterfaz`) y regenera el PNG del mod con
+  `rsvg-convert -w 256 -h 256 docs/icono.svg -o src/main/resources/icon.png`. En Modrinth se sube a mano (o con la API).
 
 ## Publicar en Modrinth
 
 1. Sube `mod_version` en `gradle.properties`.
 2. Ten tu token en `~/.gradle/gradle.properties` como `modrinthToken=mrp_...` (o en `MODRINTH_TOKEN`). Nunca en el repo.
 3. `./gradlew modrinth -PmodrinthPrueba` muestra lo que se enviaría sin subir nada.
-4. `./gradlew modrinth` compila y sube la versión al proyecto `modrinth_project_id`.
+4. `./gradlew modrinth` compila y sube la versión al proyecto `mod_slug` y actualiza su descripción con el `README.md` (lo que esté entre `<!-- modrinth_exclude.start -->` y `.end -->` no se sube).
