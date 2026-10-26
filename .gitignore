@@ -38,3 +38,6 @@ run/
 **/src/generated/**/.cache/
 repo/
 !**/src/**/repo/
+
+### Capturas (viven en la galería de Modrinth) ###
+gallery/
