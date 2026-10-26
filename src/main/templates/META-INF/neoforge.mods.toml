@@ -8,8 +8,8 @@ version="${mod_version}"
 displayName="${mod_name}"
 authors="Leonardo"
 description='''
-Interacciones afectuosas entre jugadores: abrazos, chocar los cinco, besos y más,
-elegidas desde una rueda con clic derecho y con consentimiento del otro jugador.
+Social interactions between players: hugs, high-fives, kisses, pranks, item gifts and 41 emotes,
+picked from a radial wheel, with the other player's consent.
 '''
 
 # Las poses de los brazos se aplican con un mixin sobre el modelo del jugador (solo cliente).

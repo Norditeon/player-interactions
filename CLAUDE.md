@@ -1,7 +1,9 @@
-# CLAUDE.md — Interacciones Amistosas
+# CLAUDE.md — Player Interactions
 
 Mod NeoForge 21.1.264 para Minecraft 1.21.1, en **Java 21** (NeoForge exige Java; Rust no es viable aquí).
-Paquete `com.leonardo.interacciones`, mod id `interacciones`. Mapa del código y flujo en `README.md`.
+Paquete `com.leonardo.interacciones`, mod id `interacciones`. Nombre visible **Player Interactions** (`mod_name`); el mod id y el código siguen en español.
+`README.md` (inglés) es la cara pública para GitHub/Modrinth; el mapa del código, el flujo y las recetas están en
+`docs/DESARROLLO.md` (español). Publicar: `./gradlew modrinth` (Minotaur; token fuera del repo).
 
 ## Arquitectura
 - `dominio/` y `animacion/`: lógica pura sin imports de Minecraft → testeable con JUnit (`src/test`). Mantenerlo así.
