@@ -3,6 +3,7 @@ plugins {
     id 'maven-publish'
     id 'net.neoforged.moddev' version '2.0.148'
     id 'idea'
+    id 'com.modrinth.minotaur' version '2.10.0'
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -191,6 +192,24 @@ tasks.named('processResources', ProcessResources).configure {
             rename { "${variante}.json" }
         }
     }
+}
+
+// Publicación en Modrinth con `./gradlew modrinth`. El token nunca va en el repo: se lee de
+// `modrinthToken` en ~/.gradle/gradle.properties o de la variable de entorno MODRINTH_TOKEN.
+// Con -PmodrinthPrueba no sube nada: solo muestra lo que enviaría.
+modrinth {
+    token = providers.gradleProperty('modrinthToken').orElse(providers.environmentVariable('MODRINTH_TOKEN'))
+    projectId = modrinth_project_id
+    versionNumber = mod_version
+    versionName = "${mod_name} ${mod_version}"
+    versionType = 'release'
+    uploadFile = tasks.named('jar')
+    gameVersions = [minecraft_version]
+    loaders = ['neoforge']
+    debugMode = providers.gradleProperty('modrinthPrueba').isPresent()
+}
+tasks.named('modrinth').configure {
+    notCompatibleWithConfigurationCache('Minotaur lee Task.project al ejecutarse')
 }
 
 tasks.named('test', Test).configure {
